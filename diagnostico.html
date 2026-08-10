@@ -3,189 +3,120 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Kongo Arena · Diagnóstico do Sistema</title>
+<title>Kongo Arena · Diagnóstico</title>
 <style>
-    /* ===== IDENTIDADE VISUAL KONGO ARENA ===== */
-    :root {
-        --preto: #212121;       /* Preto Profundo */
-        --dourado: #d4af37;     /* Dourado Metálico */
-        --branco: #ffffff;      /* Branco */
-        --verde: #2ecc71;
-        --vermelho: #e74c3c;
-        --amarelo: #f39c12;
-        --cinza: #2c2c2c;
-    }
-    * { margin:0; padding:0; box-sizing:border-box; }
-    body {
-        background: var(--preto);
-        color: var(--branco);
-        font-family: 'Bahnschrift', 'Segoe UI', 'DIN Alternate', Arial, sans-serif;
-        min-height: 100vh;
-        padding: 24px;
-    }
-    .container { max-width: 1100px; margin: 0 auto; }
-
-    /* Cabeçalho */
-    header {
-        display:flex; align-items:center; justify-content:space-between;
-        flex-wrap:wrap; gap:16px;
-        border-bottom: 2px solid var(--dourado);
-        padding-bottom: 18px; margin-bottom: 24px;
-    }
-    .brand { display:flex; align-items:center; gap:12px; }
-    .brand .logo {
-        width:44px; height:44px; border-radius:8px;
-        background: linear-gradient(135deg, var(--dourado), #8a6d1f);
-        display:flex; align-items:center; justify-content:center;
-        font-weight:bold; color:var(--preto); font-size:20px;
-    }
-    .brand h1 { font-size: 22px; letter-spacing:1px; }
-    .brand h1 span { color: var(--dourado); }
-    .subtitle { font-size: 13px; opacity:.7; margin-top:4px; }
-
-    button {
-        background: var(--dourado); color: var(--preto);
-        border:none; padding: 12px 24px; border-radius:6px;
-        font-weight:bold; font-size:15px; cursor:pointer;
-        transition: all .2s ease; font-family:inherit;
-    }
-    button:hover { transform: translateY(-2px); box-shadow:0 6px 18px rgba(212,175,55,.35); }
-    button:disabled { opacity:.5; cursor:not-allowed; transform:none; }
-
-    /* Aviso */
-    .notice {
-        background: rgba(243,156,18,.12);
-        border-left: 4px solid var(--amarelo);
-        padding: 14px 16px; border-radius:6px;
-        font-size:14px; margin-bottom:24px; line-height:1.5;
-    }
-    .notice b { color: var(--amarelo); }
-
-    /* Secções */
-    .section { margin-bottom: 28px; }
-    .section-title {
-        font-size: 16px; color: var(--dourado);
-        text-transform: uppercase; letter-spacing:2px;
-        margin-bottom: 14px; display:flex; align-items:center; gap:10px;
-    }
-    .section-title::after { content:''; flex:1; height:1px; background:rgba(212,175,55,.25); }
-
-    .card {
-        background: var(--cinza);
-        border:1px solid rgba(255,255,255,.08);
-        border-radius: 10px; padding: 16px; margin-bottom: 12px;
-        display:flex; align-items:center; justify-content:space-between;
-        gap:16px; flex-wrap:wrap;
-    }
-    .card .info { flex:1; min-width:200px; }
-    .card .label { font-weight:bold; font-size:15px; margin-bottom:4px; }
-    .card .url { font-size:12px; opacity:.55; word-break:break-all; font-family:monospace; }
-
-    .badge {
-        padding: 6px 14px; border-radius: 20px; font-size:13px;
-        font-weight:bold; white-space:nowrap;
-    }
-    .badge.online  { background: rgba(46,204,113,.15); color:var(--verde); border:1px solid var(--verde); }
-    .badge.offline { background: rgba(231,76,60,.15); color:var(--vermelho); border:1px solid var(--vermelho); }
-    .badge.warning { background: rgba(243,156,18,.15); color:var(--amarelo); border:1px solid var(--amarelo); }
-    .badge.testing { background: rgba(255,255,255,.1); color:var(--branco); border:1px solid rgba(255,255,255,.3); }
-
-    .time { font-size:12px; opacity:.6; min-width:70px; text-align:right; }
-
-    /* Resumo */
-    .summary {
-        display:grid; grid-template-columns:repeat(auto-fit,minmax(160px,1fr));
-        gap:14px; margin-top:8px;
-    }
-    .stat {
-        background: var(--cinza); border-radius:10px; padding:18px; text-align:center;
-        border-top:3px solid var(--dourado);
-    }
-    .stat .num { font-size:30px; font-weight:bold; }
-    .stat .lbl { font-size:12px; opacity:.7; text-transform:uppercase; letter-spacing:1px; margin-top:4px;}
-    .stat.ok .num { color:var(--verde); }
-    .stat.fail .num { color:var(--vermelho); }
-    .stat.warn .num { color:var(--amarelo); }
-
-    .log {
-        background:#111; border-radius:8px; padding:14px; font-family:monospace;
-        font-size:12px; max-height:220px; overflow-y:auto; margin-top:12px; line-height:1.7;
-    }
-    .log .l-ok { color:var(--verde); }
-    .log .l-fail { color:var(--vermelho); }
-    .log .l-warn { color:var(--amarelo); }
-    .log .l-info { color:#7f8c8d; }
-
-    footer { text-align:center; opacity:.5; font-size:12px; margin-top:32px; }
+:root{--p:#212121;--d:#d4af37;--b:#fff;--ok:#2ecc71;--er:#e74c3c;--am:#f39c12;--c:#2c2c2c}
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:var(--p);color:var(--b);font-family:Bahnschrift,'Segoe UI',Arial,sans-serif;padding:24px}
+.wrap{max-width:1000px;margin:auto}
+header{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:14px;border-bottom:2px solid var(--d);padding-bottom:16px;margin-bottom:22px}
+.logo{width:46px;height:46px;border-radius:8px;background:linear-gradient(135deg,var(--d),#8a6d1f);display:flex;align-items:center;justify-content:center;color:var(--p);font-weight:700;font-size:20px}
+h1{font-size:22px;letter-spacing:1px}h1 span{color:var(--d)}
+.sub{font-size:12px;opacity:.7;margin-top:3px}
+button{background:var(--d);color:var(--p);border:0;padding:12px 22px;border-radius:6px;font-weight:700;cursor:pointer;font-family:inherit;font-size:15px}
+button:disabled{opacity:.5;cursor:wait}
+.card{background:var(--c);border-radius:10px;padding:14px 16px;margin-bottom:10px;display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}
+.lbl{font-weight:600;font-size:14px}.url{font-size:11px;opacity:.55;font-family:monospace;word-break:break-all}
+.badge{padding:5px 12px;border-radius:16px;font-size:12px;font-weight:700;white-space:nowrap}
+.on{background:rgba(46,204,113,.15);color:var(--ok);border:1px solid var(--ok)}
+.off{background:rgba(231,76,60,.15);color:var(--er);border:1px solid var(--er)}
+.warn{background:rgba(243,156,18,.15);color:var(--am);border:1px solid var(--am)}
+.wait{background:rgba(255,255,255,.1);border:1px solid #555}
+.sec{color:var(--d);text-transform:uppercase;letter-spacing:2px;font-size:14px;margin:20px 0 12px}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:12px;margin-bottom:8px}
+.stat{background:var(--c);border-top:3px solid var(--d);border-radius:10px;padding:14px;text-align:center}
+.stat b{font-size:26px;display:block}.stat small{font-size:10px;opacity:.7;text-transform:uppercase;letter-spacing:1px}
+.log{background:#111;border-radius:8px;padding:12px;font-family:monospace;font-size:12px;max-height:200px;overflow:auto;line-height:1.8}
+footer{text-align:center;opacity:.5;font-size:12px;margin-top:28px}
 </style>
 </head>
 <body>
-<div class="container">
-
-    <header>
-        <div class="brand">
-            <div class="logo">K</div>
-            <div>
-                <h1>KONGO <span>ARENA</span></h1>
-                <div class="subtitle">Diagnóstico do Sistema · Onde o talento se encontra</div>
-            </div>
-        </div>
-        <button id="btnRun" onclick="runDiagnostic()">▶ Executar Diagnóstico</button>
-    </header>
-
-    <div class="notice">
-        <b>Nota técnica:</b> Este painel corre no GitHub Pages (HTML/JS) e testa a tua API na Locaweb via requisições externas.
-        Se os testes da API aparecerem como <b>"CORS / Rede"</b>, significa que a tua API em PHP precisa de liberar os cabeçalhos CORS
-        (ver instruções no final da página). Ele <b>não</b> acede diretamente ao banco de dados — isso só o PHP faz.
-    </div>
-
-    <!-- RESUMO -->
-    <div class="section">
-        <div class="section-title">Resumo</div>
-        <div class="summary">
-            <div class="stat ok"><div class="num" id="countOk">0</div><div class="lbl">Online</div></div>
-            <div class="stat fail"><div class="num" id="countFail">0</div><div class="lbl">Offline / Erro</div></div>
-            <div class="stat warn"><div class="num" id="countWarn">0</div><div class="lbl">Aviso / CORS</div></div>
-        </div>
-    </div>
-
-    <!-- TESTES DA API (Locaweb) -->
-    <div class="section">
-        <div class="section-title">🔌 API · Locaweb (tanquedigital.com.br)</div>
-        <div id="apiResults"></div>
-    </div>
-
-    <!-- TESTES DE FICHEIROS LOCAIS (GitHub) -->
-    <div class="section">
-        <div class="section-title">📄 Ficheiros · GitHub Pages</div>
-        <div id="fileResults"></div>
-    </div>
-
-    <!-- LOG -->
-    <div class="section">
-        <div class="section-title">📋 Registo de Execução</div>
-        <div class="log" id="log"><span class="l-info">A aguardar execução…</span></div>
-    </div>
-
-    <footer>Kongo Arena © 2026 · Ferramenta de diagnóstico · Desenvolvido por TanqueDigital</footer>
+<div class="wrap">
+<header>
+ <div style="display:flex;gap:12px;align-items:center">
+  <div class="logo">K</div>
+  <div><h1>KONGO <span>ARENA</span></h1><div class="sub">Diagnóstico do Sistema · Onde o talento se encontra</div></div>
+ </div>
+ <button id="btnRun" type="button">▶ Executar Diagnóstico</button>
+</header>
+<div class="grid">
+ <div class="stat"><b id="cOk" style="color:var(--ok)">0</b><small>Online</small></div>
+ <div class="stat"><b id="cOff" style="color:var(--er)">0</b><small>Offline</small></div>
+ <div class="stat"><b id="cWarn" style="color:var(--am)">0</b><small>Avisos</small></div>
 </div>
-
+<div class="sec">🔌 API · Locaweb</div><div id="rApi"></div>
+<div class="sec">📄 Ficheiros · GitHub Pages</div><div id="rFiles"></div>
+<div class="sec">📋 Registo</div><div class="log" id="log">A aguardar execução…</div>
+<footer>Kongo Arena © 2026 · Desenvolvido por TanqueDigital</footer>
+</div>
 <script>
-/* ============================================================
-   CONFIGURAÇÃO — ajusta aqui se os URLs mudarem
-   ============================================================ */
-const CONFIG = {
-    // URL base da tua API na Locaweb (muda para http:// se não tiver https)
-    apiBase: 'https://tanquedigital.com.br/kongo/api/index.php',
-
-    // Endpoints da API a testar
-    apiEndpoints: [
-        { label: 'Verificação de Saúde (health)', action: 'health' },
-        { label: 'Raiz da API',                   action: null   },
-        { label: 'Endpoint de Login (GET)',       action: 'login' }
-    ],
-
-    // Ficheiros locais no GitHub (relativos a este diagnostico.html)
-    localFiles: [
-        { label: 'Página Inicial (index.html)',   path: './index.html' },
-        { label: 'Login (login.html)',            path: './login.html'
+'use strict';
+var API = 'https://tanquedigital.com.br/kongo/api/index.php';
+var ok = 0, off = 0, warn = 0;
+function log(msg, cls) {
+  var el = document.getElementById('log');
+  if (el.innerHTML.indexOf('A aguardar') !== -1) el.innerHTML = '';
+  var d = document.createElement('div');
+  d.style.color = cls === 'ok' ? '#2ecc71' : (cls === 'off' ? '#e74c3c' : '#f39c12');
+  d.textContent = '[' + new Date().toLocaleTimeString() + '] ' + msg;
+  el.appendChild(d); el.scrollTop = el.scrollHeight;
+}
+function card(box, label, url) {
+  var id = 'c' + Math.random().toString(36).slice(2, 10);
+  var div = document.createElement('div');
+  div.className = 'card'; div.id = id;
+  div.innerHTML = '<div style="flex:1;min-width:200px"><div class="lbl"></div><div class="url"></div></div><div class="badge wait">A testar…</div>';
+  div.querySelector('.lbl').textContent = label;
+  div.querySelector('.url').textContent = url;
+  document.getElementById(box).appendChild(div);
+  return id;
+}
+function badge(id, type, text, ms) {
+  var el = document.getElementById(id); if (!el) return;
+  var b = el.querySelector('.badge');
+  b.className = 'badge ' + type;
+  b.textContent = text + (ms !== null ? ' · ' + ms + 'ms' : '');
+  if (type === 'on') ok++; else if (type === 'off') off++; else warn++;
+  document.getElementById('cOk').textContent = ok;
+  document.getElementById('cOff').textContent = off;
+  document.getElementById('cWarn').textContent = warn;
+}
+function ping(url, cors) {
+  var s = performance.now();
+  return fetch(url, {cache: 'no-store', mode: cors ? 'cors' : 'same-origin'})
+    .then(function (r) { return {ok: r.ok, ms: Math.round(performance.now() - s), cors: false}; })
+    .catch(function () { return {ok: false, ms: Math.round(performance.now() - s), cors: true}; });
+}
+function run() {
+  var btn = document.getElementById('btnRun');
+  btn.disabled = true; btn.textContent = 'A diagnosticar…';
+  ok = 0; off = 0; warn = 0;
+  document.getElementById('rApi').innerHTML = '';
+  document.getElementById('rFiles').innerHTML = '';
+  document.getElementById('log').innerHTML = '';
+  log('Início do diagnóstico…');
+  var jobs = [];
+  [['Raiz da API', API], ['Health Check', API + '?action=health']].forEach(function (t) {
+    var id = card('rApi', t[0], t[1]);
+    jobs.push(ping(t[1], true).then(function (r) {
+      if (r.cors) { badge(id, 'warn', 'CORS/SSL', r.ms); log('⚠ ' + t[0] + ': bloqueado pelo navegador (CORS ou SSL).', 'warn'); }
+      else if (r.ok) { badge(id, 'on', 'ONLINE', r.ms); log('✓ ' + t[0] + ' online (' + r.ms + 'ms)', 'ok'); }
+      else { badge(id, 'off', 'OFFLINE', r.ms); log('✗ ' + t[0] + ' offline', 'off'); }
+    }));
+  });
+  [['Página Inicial', './index.html'], ['Login', './login.html'], ['Validação QR', './validar.html']].forEach(function (t) {
+    var id = card('rFiles', t[0], t[1]);
+    jobs.push(ping(t[1], false).then(function (r) {
+      if (r.ok) { badge(id, 'on', 'ONLINE', r.ms); log('✓ ' + t[0] + ' encontrado', 'ok'); }
+      else { badge(id, 'off', 'OFFLINE', r.ms); log('✗ ' + t[0] + ' não encontrado', 'off'); }
+    }));
+  });
+  Promise.all(jobs).then(function () {
+    log('Diagnóstico concluído.', 'ok');
+    btn.disabled = false; btn.textContent = '↻ Executar Novamente';
+  });
+}
+document.getElementById('btnRun').addEventListener('click', run);
+</script>
+</body>
+</html>
