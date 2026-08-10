@@ -1,205 +1,30 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Kongo Arena - Plataforma de Gestão Esportiva</title>
-    <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { 
-            font-family: 'Segoe UI', Arial, sans-serif; 
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); 
-            min-height: 100vh; 
-            color: #1f2937;
-        }
-        .hero {
-            background: white;
-            padding: 80px 40px;
-            text-align: center;
-            margin-bottom: 40px;
-        }
-        .hero h1 {
-            font-size: 48px;
-            margin-bottom: 20px;
-            color: #1f2937;
-        }
-        .hero p {
-            font-size: 20px;
-            color: #6b7280;
-            max-width: 800px;
-            margin: 0 auto 40px;
-        }
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 0 20px 60px;
-        }
-        .features {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 30px;
-            margin-bottom: 60px;
-        }
-        .feature-card {
-            background: white;
-            padding: 40px;
-            border-radius: 15px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
-        }
-        .feature-card h3 {
-            font-size: 24px;
-            margin-bottom: 15px;
-            color: #667eea;
-        }
-        .feature-card p {
-            color: #6b7280;
-            line-height: 1.6;
-        }
-        .tech-stack {
-            background: white;
-            padding: 40px;
-            border-radius: 15px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
-            margin-bottom: 60px;
-        }
-        .tech-stack h2 {
-            font-size: 32px;
-            margin-bottom: 30px;
-            text-align: center;
-        }
-        .tech-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 20px;
-        }
-        .tech-item {
-            background: #f3f4f6;
-            padding: 20px;
-            border-radius: 10px;
-            text-align: center;
-        }
-        .tech-item strong {
-            display: block;
-            margin-bottom: 5px;
-            color: #667eea;
-        }
-        .footer {
-            text-align: center;
-            color: white;
-            padding: 40px 20px;
-        }
-        .footer a {
-            color: white;
-            text-decoration: none;
-            font-weight: 600;
-        }
-        .btn {
-            display: inline-block;
-            padding: 15px 40px;
-            background: #667eea;
-            color: white;
-            text-decoration: none;
-            border-radius: 10px;
-            font-weight: 600;
-            font-size: 18px;
-            transition: background 0.3s;
-            margin: 5px;
-        }
-        .btn:hover {
-            background: #5568d3;
-        }
-        .btn-secondary {
-            background: #10b981;
-        }
-        .btn-secondary:hover {
-            background: #059669;
-        }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Kongo Arena</title>
+<style>
+body{font-family:Arial;background:linear-gradient(135deg,#667eea,#764ba2);margin:0;padding:40px;text-align:center;color:white}
+.card{background:white;color:#333;border-radius:15px;padding:40px;max-width:800px;margin:20px auto;box-shadow:0 10px 30px rgba(0,0,0,0.3)}
+h1{color:#667eea}
+.btn{display:inline-block;padding:15px 30px;background:#667eea;color:white;text-decoration:none;border-radius:8px;margin:10px;font-weight:bold}
+.btn:hover{background:#5568d3}
+.btn2{background:#10b981}
+.btn2:hover{background:#059669}
+</style>
 </head>
 <body>
-    <div class="hero">
-        <h1>🏟️ Kongo Arena</h1>
-        <p>Plataforma completa de gestão esportiva para atletas, clubes e competições</p>
-        <a href="login.html" class="btn">🔐 Fazer Login</a>
-        <a href="https://tanquedigital.com.br/kongo/login.html" class="btn btn-secondary">🚀 Acessar Sistema</a>
-    </div>
-    
-    <div class="container">
-        <div class="features">
-            <div class="feature-card">
-                <h3>📊 Painel Administrativo</h3>
-                <p>Gestão completa de atletas, modalidades, clubes, equipas, competições, jogos e licenças</p>
-            </div>
-            <div class="feature-card">
-                <h3>👥 Área do Cliente</h3>
-                <p>Acompanhe sua equipa, próximos confrontos, calendário de jogos e licenças ativas</p>
-            </div>
-            <div class="feature-card">
-                <h3>🏆 Competições</h3>
-                <p>Organize campeonatos, gerencie jogos e acompanhe classificações em tempo real</p>
-            </div>
-            <div class="feature-card">
-                <h3>⚽ Jogos e Calendário</h3>
-                <p>Visualize próximos confrontos, locais de jogos e status das partidas</p>
-            </div>
-            <div class="feature-card">
-                <h3>📋 Licenças</h3>
-                <p>Controle de licenças de atletas com renovação automática e alertas de expiração</p>
-            </div>
-            <div class="feature-card">
-                <h3>🔐 Autenticação JWT</h3>
-                <p>Sistema seguro de login com tokens JWT para administradores e clientes</p>
-            </div>
-        </div>
-        
-        <div class="tech-stack">
-            <h2>🛠️ Stack Tecnológica</h2>
-            <div class="tech-grid">
-                <div class="tech-item">
-                    <strong>Backend</strong>
-                    PHP 8.5+
-                </div>
-                <div class="tech-item">
-                    <strong>Frontend</strong>
-                    HTML5, CSS3, JavaScript
-                </div>
-                <div class="tech-item">
-                    <strong>Banco de Dados</strong>
-                    MySQL (Locaweb)
-                </div>
-                <div class="tech-item">
-                    <strong>API</strong>
-                    REST com JWT
-                </div>
-                <div class="tech-item">
-                    <strong>Servidor</strong>
-                    Apache/Linux
-                </div>
-                <div class="tech-item">
-                    <strong>Versionamento</strong>
-                    Git + GitHub
-                </div>
-            </div>
-        </div>
-        
-        <div class="tech-stack">
-            <h2>🌐 Acesso ao Sistema</h2>
-            <div style="text-align: center; margin-top: 30px;">
-                <a href="admin.html" class="btn">📊 Painel Administrativo</a>
-                <a href="cliente.html" class="btn">👥 Área do Cliente</a>
-                <a href="login.html" class="btn btn-secondary">🔐 Login / Registro</a>
-                <a href="login_funcional.html" class="btn">🚨 Login de Emergência</a>
-            </div>
-            <div style="margin-top: 30px; padding: 20px; background: #f3f4f6; border-radius: 10px;">
-                <p><strong>🔑 Credenciais de Teste:</strong></p>
-                <p>Usuário: <code>admin</code> | Senha: <code>admin123</code></p>
-            </div>
-        </div>
-    </div>
-    
-    <div class="footer">
-        <p>Desenvolvido para Kongo Arena | 2026</p>
-        <p>Plataforma desenvolvida por <a href="https://tanquedigital.com.br" target="_blank">TanqueDigital</a></p>
-    </div>
+<h1>🏟️ Kongo Arena</h1>
+<p>Plataforma completa de gestão esportiva</p>
+<div class="card">
+<h2>🌐 Acesso ao Sistema</h2>
+<a href="admin.html" class="btn">📊 Painel Admin</a>
+<a href="cliente.html" class="btn">👥 Área do Cliente</a>
+<a href="login.html" class="btn btn2">🔐 Login</a>
+<br><br>
+<p><strong>🔑 Credenciais de Teste:</strong><br>Usuário: admin | Senha: admin123</p>
+</div>
+<p>Kongo Arena © 2026 · Desenvolvido por <a href="https://tanquedigital.com.br" style="color:white">TanqueDigital</a></p>
 </body>
 </html>
