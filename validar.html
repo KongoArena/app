@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Kongo Arena · Validação</title>
+<style>
+body{background:#212121;color:#fff;font-family:Bahnschrift,'Segoe UI',Arial,sans-serif;display:flex;align-items:center;justify-content:center;min-height:100vh;padding:20px}
+.card{background:#2c2c2c;border-radius:14px;padding:34px;max-width:420px;width:100%;text-align:center;border-top:4px solid #d4af37}
+h1{font-size:20px;letter-spacing:1px;margin-bottom:6px}h1 span{color:#d4af37}
+.kid{color:#d4af37;font-size:30px;font-weight:700;margin:10px 0}
+.ok{color:#2ecc71;font-weight:700}.er{color:#e74c3c;font-weight:700}
+p{opacity:.85;font-size:15px;margin:6px 0}
+</style>
+</head>
+<body>
+<div class="card" id="box"><h1>KONGO <span>ARENA</span></h1><p>A verificar…</p></div>
+<script>
+'use strict';
+var t = new URLSearchParams(window.location.search).get('t') || '';
+var box = document.getElementById('box');
+if (!t) {
+  box.innerHTML = '<h1>KONGO <span>ARENA</span></h1><p class="er">⚠️ Link sem token. Digitaliza o QR Code do cartão.</p>';
+} else {
+  fetch('https://tanquedigital.com.br/kongo/api/index.php?action=validate_qr&token=' + encodeURIComponent(t))
+  .then(function (r) { return r.json(); })
+  .then(function (d) {
+    if (d.valid) {
+      box.innerHTML = '<h1>KONGO <span>ARENA</span></h1>' +
+        '<p class="ok">🟢 KONGO ID VÁLIDO · ATLETA VERIFICADO</p>' +
+        '<div class="kid">' + d.data.kongo_number + '</div>' +
+        '<p><b>' + d.data.first_name + ' ' + d.data.last_name + '</b></p>' +
+        '<p>Estado da licença: ' + (d.data.status === 'active' ? '🟢 Activa' : d.data.status) + '</p>' +
+        '<p style="font-size:12px;opacity:.5;margin-top:14px">kongoarena.com · Onde o talento se encontra</p>';
+    } else {
+      box.innerHTML = '<h1>KONGO <span>ARENA</span></h1><p class="er">🔴 ' + d.message + '</p>';
+    }
+  })
+  .catch(function () {
+    box.innerHTML = '<h1>KONGO <span>ARENA</span></h1><p class="er">⚠️ Não foi possível validar agora. Tenta novamente.</p>';
+  });
+}
+</script>
+</body>
+</html>
