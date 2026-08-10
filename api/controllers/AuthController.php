@@ -37,16 +37,4 @@ class AuthController {
             'message' => $resultado ? 'Utilizador criado com sucesso' : 'Erro ao criar utilizador'
         ]);
     }
-}
-
-// Roteamento
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $controller = new AuthController();
-    
-    if (strpos($_SERVER['REQUEST_URI'], '/login') !== false) {
-        $controller->login();
-    } elseif (strpos($_SERVER['REQUEST_URI'], '/register') !== false) {
-        $controller->register();
-    }
-}
-?>
+?>

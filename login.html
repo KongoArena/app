@@ -109,11 +109,38 @@
             font-size: 14px;
             outline: none;
             transition: border-color 0.2s ease;
+            box-sizing: border-box;
         }
 
         .form-group input:focus {
             border-color: var(--gold, #e8b93f);
+            box-shadow: 0 0 0 3px rgba(232,185,63,0.08);
         }
+
+        .input-wrapper {
+            position: relative;
+        }
+
+        .input-wrapper input {
+            padding-right: 44px;
+        }
+
+        .toggle-pw {
+            position: absolute;
+            right: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            cursor: pointer;
+            color: var(--muted, #8c8c92);
+            font-size: 16px;
+            padding: 0;
+            line-height: 1;
+            transition: color 0.2s;
+        }
+
+        .toggle-pw:hover { color: var(--gold, #e8b93f); }
 
         .btn-submit {
             width: 100%;
@@ -209,7 +236,10 @@
             </div>
             <div class="form-group">
                 <label for="loginSenha">Palavra-passe</label>
-                <input type="password" id="loginSenha" placeholder="••••••••" required>
+                <div class="input-wrapper">
+                    <input type="password" id="loginSenha" placeholder="••••••••" required>
+                    <button type="button" class="toggle-pw" onclick="toggleSenha('loginSenha', this)" aria-label="Mostrar/ocultar senha">👁️</button>
+                </div>
             </div>
             <button type="submit" id="btnLoginSubmit" class="btn-submit">Entrar na Conta</button>
         </form>
@@ -230,11 +260,17 @@
             </div>
             <div class="form-group">
                 <label for="regSenha">Palavra-passe</label>
-                <input type="password" id="regSenha" placeholder="Crie uma palavra-passe" required minlength="6">
+                <div class="input-wrapper">
+                    <input type="password" id="regSenha" placeholder="Crie uma palavra-passe" required minlength="6">
+                    <button type="button" class="toggle-pw" onclick="toggleSenha('regSenha', this)" aria-label="Mostrar senha">👁️</button>
+                </div>
             </div>
             <div class="form-group">
                 <label for="regSenhaConfirm">Confirmar Palavra-passe</label>
-                <input type="password" id="regSenhaConfirm" placeholder="Repita a palavra-passe" required minlength="6">
+                <div class="input-wrapper">
+                    <input type="password" id="regSenhaConfirm" placeholder="Repita a palavra-passe" required minlength="6">
+                    <button type="button" class="toggle-pw" onclick="toggleSenha('regSenhaConfirm', this)" aria-label="Mostrar confirmação">👁️</button>
+                </div>
             </div>
             <button type="submit" id="btnRegSubmit" class="btn-submit">Criar Minha Conta</button>
         </form>
@@ -255,7 +291,23 @@
             document.getElementById('tabRegister').classList.toggle('active', tab === 'register');
             document.getElementById('formLogin').classList.toggle('active', tab === 'login');
             document.getElementById('formRegister').classList.toggle('active', tab === 'register');
-            document.getElementById('alertBox').style.display = 'none';
+            const alertBox = document.getElementById('alertBox');
+            alertBox.className = 'alert-box';
+            alertBox.style.display = 'none';
+            // Limpa o formulário que estava ativo
+            if (tab === 'login') document.getElementById('formRegister').reset();
+            else document.getElementById('formLogin').reset();
+        }
+
+        function toggleSenha(inputId, btn) {
+            const input = document.getElementById(inputId);
+            if (input.type === 'password') {
+                input.type = 'text';
+                btn.textContent = '🙈';
+            } else {
+                input.type = 'password';
+                btn.textContent = '👁️';
+            }
         }
 
         function showAlert(message, type = 'error') {

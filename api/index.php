@@ -1,8 +1,7 @@
 <?php
-// Ponte simples: redireciona para a API real
-require __DIR__ . '/../../api/index.php';
-
 // api/index.php - Roteamento central via parâmetro GET "rota" (?rota=...)
+require_once __DIR__ . '/config/database.php';
+require_once __DIR__ . '/config/jwt.php';
 
 header('Content-Type: application/json');
 header('Access-Control-Allow-Origin: *');
