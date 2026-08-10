@@ -23,7 +23,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
 function checkAuth() {
     if (!state.token) {
-        window.location.href = 'login.html';
+        window.location.href = '../login.html';
         return;
     }
     
@@ -40,7 +40,7 @@ function checkAuth() {
 function logout() {
     localStorage.removeItem('token');
     localStorage.removeItem('user');
-    window.location.href = 'login.html';
+    window.location.href = '../login.html';
 }
 
 function initSidebar() {

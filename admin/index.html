@@ -20,7 +20,7 @@
             // 1. Se não tem token, vai para login
             if (!token || !userStr) {
                 console.log('⛔ Sem token. Redirecionando para login...');
-                window.location.href = 'login.html';
+                window.location.href = '../login.html';
                 return;
             }
 
@@ -52,7 +52,7 @@
             } catch (e) {
                 console.error('Erro ao ler usuário:', e);
                 localStorage.clear();
-                window.location.href = 'login.html';
+                window.location.href = '../login.html';
             }
         })();
     </script>
@@ -110,7 +110,7 @@
             if (confirm('Tem certeza que deseja terminar a sessão?')) {
                 localStorage.removeItem('kongo_token');
                 localStorage.removeItem('kongo_user');
-                window.location.href = 'login.html';
+                window.location.href = '../login.html';
             }
         }
     </script>

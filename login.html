@@ -1,0 +1,366 @@
+<!DOCTYPE html>
+<html lang="pt">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kongo Arena · Entrar e Criar Conta</title>
+    <link rel="icon" type="image/png" href="admin/assets/favicon.png">
+    <link rel="stylesheet" href="admin/css/style.css">
+    <style>
+        body {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: radial-gradient(circle at top center, #1e1e24 0%, #0c0c0e 80%);
+            margin: 0;
+            padding: 20px;
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            color: var(--text, #f2f2f0);
+        }
+
+        .auth-container {
+            width: 100%;
+            max-width: 440px;
+            background: var(--panel, #17171a);
+            border: 1px solid var(--panel-border, #2a2a2f);
+            border-radius: 16px;
+            padding: 32px 28px;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.6);
+        }
+
+        .auth-header {
+            text-align: center;
+            margin-bottom: 24px;
+        }
+
+        .auth-header img {
+            max-height: 90px;
+            width: auto;
+            display: block;
+            margin: 0 auto 16px;
+        }
+
+        .auth-header h1 {
+            font-size: 20px;
+            margin: 0 0 6px;
+            font-weight: 700;
+        }
+
+        .auth-header p {
+            color: var(--muted, #8c8c92);
+            font-size: 13px;
+            margin: 0;
+        }
+
+        .auth-tabs {
+            display: flex;
+            border-bottom: 1px solid var(--panel-border, #2a2a2f);
+            margin-bottom: 24px;
+        }
+
+        .auth-tab {
+            flex: 1;
+            padding: 12px 0;
+            text-align: center;
+            background: none;
+            border: none;
+            color: var(--muted, #8c8c92);
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            border-bottom: 2px solid transparent;
+            transition: all 0.2s ease;
+        }
+
+        .auth-tab.active {
+            color: var(--gold, #e8b93f);
+            border-bottom-color: var(--gold, #e8b93f);
+        }
+
+        .auth-form {
+            display: none;
+        }
+
+        .auth-form.active {
+            display: block;
+        }
+
+        .form-group {
+            margin-bottom: 18px;
+        }
+
+        .form-group label {
+            display: block;
+            font-size: 12.5px;
+            color: var(--muted, #8c8c92);
+            margin-bottom: 6px;
+            font-weight: 500;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 11px 14px;
+            background: #0c0c0e;
+            border: 1px solid var(--panel-border, #2a2a2f);
+            border-radius: 8px;
+            color: var(--text, #f2f2f0);
+            font-size: 14px;
+            outline: none;
+            transition: border-color 0.2s ease;
+        }
+
+        .form-group input:focus {
+            border-color: var(--gold, #e8b93f);
+        }
+
+        .btn-submit {
+            width: 100%;
+            padding: 12px;
+            background: var(--gold, #e8b93f);
+            color: #1a1500;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: filter 0.2s ease;
+            margin-top: 8px;
+        }
+
+        .btn-submit:hover {
+            filter: brightness(1.1);
+        }
+
+        .btn-submit:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        .alert-box {
+            padding: 12px 14px;
+            border-radius: 8px;
+            font-size: 13px;
+            margin-bottom: 18px;
+            display: none;
+        }
+
+        .alert-box.error {
+            display: block;
+            background: rgba(224, 92, 92, 0.12);
+            color: var(--danger, #e05c5c);
+            border: 1px solid rgba(224, 92, 92, 0.3);
+        }
+
+        .alert-box.success {
+            display: block;
+            background: rgba(107, 207, 127, 0.12);
+            color: var(--success, #6bcf7f);
+            border: 1px solid rgba(107, 207, 127, 0.3);
+        }
+
+        .auth-footer {
+            margin-top: 24px;
+            text-align: center;
+            font-size: 12px;
+            color: var(--muted, #8c8c92);
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="auth-container">
+        <div class="auth-header">
+            <img src="admin/assets/logo-login.png" alt="Kongo Arena">
+            <h1>Bem-vindo ao Kongo Arena</h1>
+            <p>Acesse sua conta ou crie um novo cadastro</p>
+        </div>
+
+        <div class="auth-tabs">
+            <button class="auth-tab active" id="tabLogin" onclick="switchTab('login')">Entrar</button>
+            <button class="auth-tab" id="tabRegister" onclick="switchTab('register')">Criar Conta</button>
+        </div>
+
+        <div id="alertBox" class="alert-box"></div>
+
+        <!-- FORMULÁRIO DE LOGIN -->
+        <form id="formLogin" class="auth-form active" onsubmit="handleLogin(event)">
+            <div class="form-group">
+                <label for="loginEmail">E-mail</label>
+                <input type="email" id="loginEmail" placeholder="seu@email.com" required>
+            </div>
+            <div class="form-group">
+                <label for="loginSenha">Palavra-passe</label>
+                <input type="password" id="loginSenha" placeholder="••••••••" required>
+            </div>
+            <button type="submit" id="btnLoginSubmit" class="btn-submit">Entrar na Conta</button>
+        </form>
+
+        <!-- FORMULÁRIO DE REGISTO -->
+        <form id="formRegister" class="auth-form" onsubmit="handleRegister(event)">
+            <div class="form-group">
+                <label for="regNome">Nome Completo</label>
+                <input type="text" id="regNome" placeholder="Seu nome completo" required>
+            </div>
+            <div class="form-group">
+                <label for="regEmail">E-mail</label>
+                <input type="email" id="regEmail" placeholder="seu@email.com" required>
+            </div>
+            <div class="form-group">
+                <label for="regTelefone">Telefone (opcional)</label>
+                <input type="tel" id="regTelefone" placeholder="+244 9xx xxx xxx">
+            </div>
+            <div class="form-group">
+                <label for="regSenha">Palavra-passe</label>
+                <input type="password" id="regSenha" placeholder="Crie uma palavra-passe" required minlength="6">
+            </div>
+            <div class="form-group">
+                <label for="regSenhaConfirm">Confirmar Palavra-passe</label>
+                <input type="password" id="regSenhaConfirm" placeholder="Repita a palavra-passe" required minlength="6">
+            </div>
+            <button type="submit" id="btnRegSubmit" class="btn-submit">Criar Minha Conta</button>
+        </form>
+
+        <footer
+            style="text-align: center; padding: 20px; margin-top: 40px; font-size: 13px; color: #888; border-top: 1px solid #eee;">
+            Kongo Arena © 2026 · Plataforma Desportiva <br>
+            Desenvolvido por <a href="https://tanquedigital.com.br" target="_blank" rel="noopener noreferrer"
+                style="color: #0066cc; text-decoration: none; font-weight: bold; transition: 0.3s;">TanqueDigital</a>
+        </footer>
+    </div>
+
+    <script>
+        // 🛡️ SCRIPT DE LOGIN E REGISTO - KONGO ARENA (Correção de Conexão)
+
+        function switchTab(tab) {
+            document.getElementById('tabLogin').classList.toggle('active', tab === 'login');
+            document.getElementById('tabRegister').classList.toggle('active', tab === 'register');
+            document.getElementById('formLogin').classList.toggle('active', tab === 'login');
+            document.getElementById('formRegister').classList.toggle('active', tab === 'register');
+            document.getElementById('alertBox').style.display = 'none';
+        }
+
+        function showAlert(message, type = 'error') {
+            const alertBox = document.getElementById('alertBox');
+            alertBox.className = 'alert-box ' + type;
+            alertBox.innerText = message;
+            alertBox.style.display = 'block';
+        }
+
+        async function handleLogin(event) {
+            event.preventDefault();
+
+            const email = document.getElementById('loginEmail').value.trim();
+            const senha = document.getElementById('loginSenha').value;
+            const btn = document.getElementById('btnLoginSubmit');
+
+            if (!email || !senha) {
+                showAlert('Por favor, preencha o e-mail e a palavra-passe.');
+                return;
+            }
+
+            btn.disabled = true;
+            btn.innerText = 'A entrar...';
+
+            // ⚠️ CORREÇÃO 1: Caminho RELATIVO (sem a barra "/" no início)
+            const apiUrl = 'api/index.php?rota=login';
+
+            try {
+                const response = await fetch(apiUrl, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email: email, senha: senha })
+                });
+
+                // ⚠️ CORREÇÃO 2: Ler como texto primeiro para capturar erros do PHP
+                const textoResposta = await response.text();
+                console.log('📡 Resposta bruta do servidor:', textoResposta);
+
+                let data;
+                try {
+                    data = JSON.parse(textoResposta);
+                } catch (e) {
+                    showAlert('Erro interno no servidor (PHP). Veja o Console (F12).', 'error');
+                    console.error('❌ O servidor devolveu HTML em vez de JSON:', textoResposta);
+                    btn.disabled = false;
+                    btn.innerText = 'Entrar na Conta';
+                    return;
+                }
+
+                if (data.success === false || !data.token) {
+                    showAlert(data.message || 'E-mail ou palavra-passe incorretos.', 'error');
+                    btn.disabled = false;
+                    btn.innerText = 'Entrar na Conta';
+                    return;
+                }
+
+                const user = data.utilizador || data.user || {};
+                localStorage.setItem('kongo_token', data.token);
+                localStorage.setItem('kongo_user', JSON.stringify(user));
+
+                // 🎯 Redirecionamento
+                if (user.tipo === 'admin') {
+                    window.location.href = 'admin/index.html';
+                } else {
+                    window.location.href = 'admin/cliente.html';
+                }
+
+            } catch (error) {
+                console.error('Erro de rede:', error);
+                showAlert('Falha ao conectar. Verifique o Console (F12).', 'error');
+                btn.disabled = false;
+                btn.innerText = 'Entrar na Conta';
+            }
+        }
+
+        async function handleRegister(event) {
+            event.preventDefault();
+            const nome = document.getElementById('regNome').value.trim();
+            const email = document.getElementById('regEmail').value.trim();
+            const telefone = document.getElementById('regTelefone').value.trim();
+            const senha = document.getElementById('regSenha').value;
+            const senhaConfirm = document.getElementById('regSenhaConfirm').value;
+            const btn = document.getElementById('btnRegSubmit');
+
+            if (senha !== senhaConfirm) {
+                showAlert('As palavras-passe não coincidem.', 'error');
+                return;
+            }
+
+            btn.disabled = true;
+            btn.innerText = 'A criar conta...';
+
+            try {
+                const response = await fetch('api/index.php?rota=register', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ nome_completo: nome, email: email, telefone: telefone, senha: senha })
+                });
+
+                const textoResposta = await response.text();
+                let data;
+                try { data = JSON.parse(textoResposta); } catch (e) { data = { success: false, message: 'Erro no servidor' }; }
+
+                if (data.success) {
+                    showAlert('Conta criada com sucesso! Já podes entrar.', 'success');
+                    setTimeout(() => switchTab('login'), 2000);
+                } else {
+                    showAlert(data.message || 'Erro ao criar a conta.', 'error');
+                }
+
+                btn.disabled = false;
+                btn.innerText = 'Criar Minha Conta';
+
+            } catch (error) {
+                console.error('Erro no registo:', error);
+                showAlert('Erro de conexão.', 'error');
+                btn.disabled = false;
+                btn.innerText = 'Criar Minha Conta';
+            }
+        }
+    </script>
+</body>
+
+</html>

@@ -34,7 +34,7 @@ const KongoAPI = {
             if (response.status === 401 || response.status === 403) {
                 alert('Sessão expirada. Faça login novamente.');
                 localStorage.removeItem('kongo_token');
-                window.location.href = 'login.html';
+                window.location.href = '../login.html';
                 return;
             }
 
