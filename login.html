@@ -166,12 +166,28 @@
             font-size: 12px;
             color: var(--muted, #8c8c92);
         }
+
+        .btn-voltar {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            margin-bottom: 18px;
+            font-size: 13px;
+            color: var(--muted, #8c8c92);
+            text-decoration: none;
+            transition: color 0.2s ease;
+        }
+
+        .btn-voltar:hover {
+            color: var(--gold, #e8b93f);
+        }
     </style>
 </head>
 
 <body>
 
     <div class="auth-container">
+        <a href="index.html" class="btn-voltar">&larr; Voltar ao site</a>
         <div class="auth-header">
             <img src="admin/assets/logo-login.png" alt="Kongo Arena">
             <h1>Bem-vindo ao Kongo Arena</h1>
