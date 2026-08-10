@@ -1,196 +1,221 @@
 <?php
-// kongo/api/index.php
-// ============================================
-// 1. CABEÇALHOS CORS (permite GitHub falar com Locaweb)
-// ============================================
-header("Access-Control-Allow-Origin: *");
-header("Access-Control-Allow-Methods: POST, GET, OPTIONS");
-header("Access-Control-Allow-Headers: Content-Type, Authorization, X-Requested-With");
-header('Content-Type: application/json; charset=utf-8');
-
-if ($_SERVER['REQUEST_METHOD'] == 'OPTIONS') {
-    http_response_code(200);
-    exit(0);
-}
-
-// ============================================
-// 2. CARREGAR DEPENDÊNCIAS
-// ============================================
+// api/index.php - Roteamento central via parâmetro GET "rota" (?rota=...)
 require_once __DIR__ . '/config/database.php';
-// Se tiveres ficheiro jwt.php:
-// require_once __DIR__ . '/config/jwt.php';
+require_once __DIR__ . '/config/jwt.php';
 
-// ============================================
-// 3. ROUTER DA API
-// ============================================
-$action = $_GET['action'] ?? 'root';
+header('Content-Type: application/json');
+header('Access-Control-Allow-Origin: *');
+header('Access-Control-Allow-Methods: GET, POST, PUT, DELETE, OPTIONS');
+header('Access-Control-Allow-Headers: Content-Type, Authorization');
 
-try {
-    $pdo = getDBConnection();
-
-    switch ($action) {
-
-        // ---------- RAIZ ----------
-        case 'root':
-            echo json_encode([
-                'success' => true,
-                'message' => 'API Kongo Arena funcionando!',
-                'version' => '1.0',
-                'timestamp' => date('c')
-            ]);
-            break;
-
-        // ---------- HEALTH CHECK ----------
-        case 'health':
-            // Testa a ligação real à BD
-            $stmt = $pdo->query("SELECT 1");
-            $stmt->execute();
-            echo json_encode([
-                'success' => true,
-                'status' => 'healthy',
-                'database' => 'connected',
-                'php_version' => phpversion()
-            ]);
-            break;
-
-        // ---------- LOGIN (POST) ----------
-        case 'login':
-            if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-                http_response_code(405);
-                echo json_encode(['success' => false, 'message' => 'Método não permitido. Use POST.']);
-                break;
-            }
-
-            $input = json_decode(file_get_contents('php://input'), true);
-            $email = filter_var($input['email'] ?? '', FILTER_SANITIZE_EMAIL);
-            $password = $input['password'] ?? '';
-
-            if (empty($email) || empty($password)) {
-                echo json_encode(['success' => false, 'message' => 'E-mail e palavra-passe obrigatórios.']);
-                break;
-            }
-
-            $stmt = $pdo->prepare("SELECT id, name, email, password, role FROM users WHERE email = ?");
-            $stmt->execute([$email]);
-            $user = $stmt->fetch();
-
-            if (!$user) {
-                echo json_encode(['success' => false, 'message' => 'Credenciais inválidas.']);
-                break;
-            }
-
-            // Verifica a palavra-passe encriptada
-            if (!password_verify($password, $user['password'])) {
-                echo json_encode(['success' => false, 'message' => 'Credenciais inválidas.']);
-                break;
-            }
-
-            // Gera um token simples (JWT seria o ideal, mas isto já funciona)
-            $token = base64_encode(json_encode([
-                'user_id' => $user['id'],
-                'role' => $user['role'],
-                'exp' => time() + (60 * 60 * 24) // 24 horas
-            ]));
-
-            echo json_encode([
-                'success' => true,
-                'message' => 'Login bem-sucedido!',
-                'token' => $token,
-                'user' => [
-                    'id' => $user['id'],
-                    'name' => $user['name'],
-                    'email' => $user['email'],
-                    'role' => $user['role']
-                ]
-            ]);
-            break;
-
-        // ---------- GERAR KONGO ID ----------
-        case 'generate_kongo_id':
-            if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-                http_response_code(405);
-                echo json_encode(['success' => false, 'message' => 'Use POST.']);
-                break;
-            }
-
-            $input = json_decode(file_get_contents('php://input'), true);
-            $athleteId = $input['athlete_id'] ?? null;
-            $orgId = $input['org_id'] ?? null;
-
-            if (!$athleteId) {
-                echo json_encode(['success' => false, 'message' => 'ID do atleta obrigatório.']);
-                break;
-            }
-
-            // Próximo número sequencial
-            $stmt = $pdo->query("SELECT kongo_number FROM kongo_ids ORDER BY id DESC LIMIT 1");
-            $last = $stmt->fetchColumn();
-            $newNumber = 'KA-000001';
-            if ($last) {
-                $num = (int)substr($last, 3);
-                $newNumber = 'KA-' . str_pad($num + 1, 6, '0', STR_PAD_LEFT);
-            }
-
-            $qrToken = bin2hex(random_bytes(16));
-
-            $stmt = $pdo->prepare("
-                INSERT INTO kongo_ids (athlete_id, kongo_number, qr_token, current_organization_id, status) 
-                VALUES (?, ?, ?, ?, 'active')
-            ");
-            $stmt->execute([$athleteId, $newNumber, $qrToken, $orgId]);
-
-            echo json_encode([
-                'success' => true,
-                'message' => 'Kongo ID gerado com sucesso!',
-                'data' => [
-                    'kongo_number' => $newNumber,
-                    'qr_token' => $qrToken,
-                    'validation_url' => "https://tanquedigital.com.br/kongo/api/index.php?action=validate_qr&token=" . $qrToken
-                ]
-            ]);
-            break;
-
-        // ---------- VALIDAR QR CODE (público) ----------
-        case 'validate_qr':
-            $token = $_GET['token'] ?? '';
-            if (empty($token)) {
-                echo json_encode(['valid' => false, 'message' => 'Token em falta.']);
-                break;
-            }
-
-            $stmt = $pdo->prepare("
-                SELECT k.kongo_number, k.status, a.first_name, a.last_name, o.name as org_name
-                FROM kongo_ids k
-                JOIN athletes a ON k.athlete_id = a.id
-                LEFT JOIN organizations o ON k.current_organization_id = o.id
-                WHERE k.qr_token = ?
-            ");
-            $stmt->execute([$token]);
-            $row = $stmt->fetch();
-
-            if ($row) {
-                echo json_encode([
-                    'valid' => true,
-                    'status' => $row['status'],
-                    'athlete' => $row['first_name'] . ' ' . $row['last_name'],
-                    'kongo_id' => $row['kongo_number'],
-                    'organization' => $row['org_name']
-                ]);
-            } else {
-                echo json_encode(['valid' => false, 'message' => 'Kongo ID inválido ou expirado.']);
-            }
-            break;
-
-        default:
-            http_response_code(404);
-            echo json_encode(['success' => false, 'message' => 'Ação não encontrada.']);
-    }
-
-} catch (PDOException $e) {
-    http_response_code(500);
-    error_log("Kongo API Error: " . $e->getMessage());
-    echo json_encode(['success' => false, 'message' => 'Erro interno no servidor.']);
-} catch (Exception $e) {
-    http_response_code(500);
-    echo json_encode(['success' => false, 'message' => 'Erro: ' . $e->getMessage()]);
+if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
+    http_response_code(200);
+    exit;
 }
+
+// Autoload simples
+spl_autoload_register(function ($class) {
+    $paths = ['models/', 'controllers/', 'middleware/'];
+    foreach ($paths as $path) {
+        $file = __DIR__ . '/' . $path . $class . '.php';
+        if (file_exists($file)) {
+            require_once $file;
+            return;
+        }
+    }
+});
+
+$rota = $_GET['rota'] ?? '';
+$metodo = $_SERVER['REQUEST_METHOD'];
+$partes = array_values(array_filter(explode('/', $rota), fn($p) => $p !== ''));
+$recurso = $partes[0] ?? '';
+$id1 = $partes[1] ?? null;
+$sub = $partes[2] ?? null;
+$id2 = $partes[3] ?? null;
+
+// Rota padrão de teste / documentação
+if (empty($rota)) {
+    echo json_encode([
+        'status' => 'ok',
+        'message' => 'API Kongo Arena funcionando!',
+        'rotas_disponiveis' => [
+            'AUTENTICAÇÃO' => [
+                'POST ?rota=login', 'POST ?rota=register'
+            ],
+            'ATLETAS' => [
+                'GET ?rota=atletas', 'POST ?rota=atletas', 'GET ?rota=atletas/ID',
+                'PUT ?rota=atletas/ID', 'POST ?rota=atletas/ID/modalidades'
+            ],
+            'MODALIDADES' => [
+                'GET ?rota=modalidades', 'POST ?rota=modalidades', 'GET ?rota=modalidades/ID',
+                'PUT ?rota=modalidades/ID', 'POST ?rota=modalidades/ID/status'
+            ],
+            'CLUBES' => [
+                'GET ?rota=clubes', 'POST ?rota=clubes', 'GET ?rota=clubes/ID',
+                'PUT ?rota=clubes/ID', 'DELETE ?rota=clubes/ID'
+            ],
+            'EQUIPAS' => [
+                'GET ?rota=equipas', 'POST ?rota=equipas', 'GET ?rota=equipas/ID',
+                'PUT ?rota=equipas/ID', 'DELETE ?rota=equipas/ID',
+                'POST ?rota=equipas/ID/atletas', 'DELETE ?rota=equipas/ID/atletas/ATLETA_ID'
+            ],
+            'TEMPORADAS' => [
+                'GET ?rota=temporadas', 'POST ?rota=temporadas', 'PUT ?rota=temporadas/ID'
+            ],
+            'COMPETIÇÕES' => [
+                'GET ?rota=competicoes', 'POST ?rota=competicoes', 'GET ?rota=competicoes/ID',
+                'PUT ?rota=competicoes/ID', 'POST ?rota=competicoes/ID/equipas',
+                'DELETE ?rota=competicoes/ID/equipas/EQUIPA_ID', 'GET ?rota=competicoes/ID/classificacao'
+            ],
+            'JOGOS' => [
+                'GET ?rota=jogos', 'POST ?rota=jogos', 'GET ?rota=jogos/ID',
+                'PUT ?rota=jogos/ID/resultado', 'DELETE ?rota=jogos/ID'
+            ],
+            'RANKINGS' => [
+                'GET ?rota=rankings/competicao/ID', 'GET ?rota=rankings/modalidade/ID',
+                'POST ?rota=rankings/competicao/ID/recalcular'
+            ],
+            'LICENÇAS' => [
+                'GET ?rota=licencas', 'GET ?rota=licencas/ID_ATLETA',
+                'POST ?rota=licencas/ID_ATLETA/renovar', 'POST ?rota=licencas/atualizar-expiradas'
+            ],
+            'DASHBOARD' => [
+                'GET ?rota=dashboard/estatisticas'
+            ]
+        ]
+    ]);
+    exit;
+}
+
+// =============================================
+// AUTENTICAÇÃO
+// =============================================
+if ($metodo === 'POST' && $rota === 'login') {
+    (new AuthController())->login(); exit;
+}
+if ($metodo === 'POST' && $rota === 'register') {
+    (new AuthController())->register(); exit;
+}
+
+// =============================================
+// ATLETAS
+// =============================================
+if ($recurso === 'atletas') {
+    $c = new AtletaController();
+    if ($metodo === 'GET' && !$id1) { $c->listar(); exit; }
+    if ($metodo === 'POST' && !$id1) { $c->criar(); exit; }
+    if ($metodo === 'GET' && $id1 && !$sub) { $c->detalhes($id1); exit; }
+    if ($metodo === 'PUT' && $id1 && !$sub) { $c->atualizar($id1); exit; }
+    if ($metodo === 'POST' && $id1 && $sub === 'modalidades') { $c->adicionarModalidade($id1); exit; }
+}
+
+// =============================================
+// MODALIDADES
+// =============================================
+if ($recurso === 'modalidades') {
+    $c = new ModalidadeController();
+    if ($metodo === 'GET' && !$id1) { $c->listar(); exit; }
+    if ($metodo === 'POST' && !$id1) { $c->criar(); exit; }
+    if ($metodo === 'GET' && $id1 && !$sub) { $c->detalhes($id1); exit; }
+    if ($metodo === 'PUT' && $id1 && !$sub) { $c->atualizar($id1); exit; }
+    if ($metodo === 'POST' && $id1 && $sub === 'status') { $c->alternarStatus($id1); exit; }
+}
+
+// =============================================
+// CLUBES
+// =============================================
+if ($recurso === 'clubes') {
+    $c = new ClubeController();
+    if ($metodo === 'GET' && !$id1) { $c->listar(); exit; }
+    if ($metodo === 'POST' && !$id1) { $c->criar(); exit; }
+    if ($metodo === 'GET' && $id1) { $c->detalhes($id1); exit; }
+    if ($metodo === 'PUT' && $id1) { $c->atualizar($id1); exit; }
+    if ($metodo === 'DELETE' && $id1) { $c->apagar($id1); exit; }
+}
+
+// =============================================
+// EQUIPAS
+// =============================================
+if ($recurso === 'equipas') {
+    $c = new EquipaController();
+    if ($metodo === 'GET' && !$id1) { $c->listar(); exit; }
+    if ($metodo === 'POST' && !$id1) { $c->criar(); exit; }
+    if ($metodo === 'GET' && $id1 && !$sub) { $c->detalhes($id1); exit; }
+    if ($metodo === 'PUT' && $id1 && !$sub) { $c->atualizar($id1); exit; }
+    if ($metodo === 'DELETE' && $id1 && !$sub) { $c->apagar($id1); exit; }
+    if ($metodo === 'POST' && $id1 && $sub === 'atletas') { $c->adicionarAtleta($id1); exit; }
+    if ($metodo === 'DELETE' && $id1 && $sub === 'atletas' && $id2) { $c->removerAtleta($id1, $id2); exit; }
+}
+
+// =============================================
+// TEMPORADAS
+// =============================================
+if ($recurso === 'temporadas') {
+    $c = new TemporadaController();
+    if ($metodo === 'GET' && !$id1) { $c->listar(); exit; }
+    if ($metodo === 'POST' && !$id1) { $c->criar(); exit; }
+    if ($metodo === 'PUT' && $id1) { $c->atualizar($id1); exit; }
+}
+
+// =============================================
+// COMPETIÇÕES
+// =============================================
+if ($recurso === 'competicoes') {
+    $c = new CompeticaoController();
+    if ($metodo === 'GET' && !$id1) { $c->listar(); exit; }
+    if ($metodo === 'POST' && !$id1) { $c->criar(); exit; }
+    if ($metodo === 'GET' && $id1 && !$sub) { $c->detalhes($id1); exit; }
+    if ($metodo === 'PUT' && $id1 && !$sub) { $c->atualizar($id1); exit; }
+    if ($metodo === 'POST' && $id1 && $sub === 'equipas') { $c->adicionarEquipa($id1); exit; }
+    if ($metodo === 'DELETE' && $id1 && $sub === 'equipas' && $id2) { $c->removerEquipa($id1, $id2); exit; }
+    if ($metodo === 'GET' && $id1 && $sub === 'classificacao') { $c->classificacao($id1); exit; }
+}
+
+// =============================================
+// JOGOS
+// =============================================
+if ($recurso === 'jogos') {
+    $c = new JogoController();
+    if ($metodo === 'GET' && !$id1) { $c->listar(); exit; }
+    if ($metodo === 'POST' && !$id1) { $c->criar(); exit; }
+    if ($metodo === 'GET' && $id1 && !$sub) { $c->detalhes($id1); exit; }
+    if ($metodo === 'PUT' && $id1 && $sub === 'resultado') { $c->registarResultado($id1); exit; }
+    if ($metodo === 'DELETE' && $id1 && !$sub) { $c->apagar($id1); exit; }
+}
+
+// =============================================
+// RANKINGS
+// =============================================
+if ($recurso === 'rankings') {
+    $c = new RankingController();
+    if ($metodo === 'GET' && $id1 === 'competicao' && $sub) { $c->porCompeticao($sub); exit; }
+    if ($metodo === 'GET' && $id1 === 'modalidade' && $sub) { $c->porModalidade($sub); exit; }
+    if ($metodo === 'POST' && $id1 === 'competicao' && $sub && $id2 === 'recalcular') { $c->recalcular($sub); exit; }
+}
+
+// =============================================
+// LICENÇAS
+// =============================================
+if ($recurso === 'licencas') {
+    $c = new LicencaController();
+    if ($metodo === 'GET' && !$id1) { $c->listar(); exit; }
+    if ($metodo === 'POST' && $id1 === 'atualizar-expiradas') { $c->atualizarExpiradas(); exit; }
+    if ($metodo === 'GET' && $id1 && !$sub) { $c->porAtleta($id1); exit; }
+    if ($metodo === 'POST' && $id1 && $sub === 'renovar') { $c->renovar($id1); exit; }
+}
+
+// =============================================
+// DASHBOARD
+// =============================================
+if ($recurso === 'dashboard' && $id1 === 'estatisticas' && $metodo === 'GET') {
+    (new DashboardController())->estatisticas(); exit;
+}
+
+// Se nenhuma rota for encontrada
+http_response_code(404);
+echo json_encode([
+    'error' => 'Rota não encontrada',
+    'rota_solicitada' => $rota,
+    'metodo' => $metodo
+]);
+?>
