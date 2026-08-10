@@ -1,9 +1,12 @@
 <?php
 // Configuração da base de dados
-define('DB_HOST', 'myshared2003');
-define('DB_NAME', 'luna_home');
-define('DB_USER', 'luna_home');
-define('DB_PASS', 'Akiles1539@@##');
+// As credenciais NÃO ficam no código - vêm de variáveis de ambiente.
+// Configure isso no seu servidor (painel de hospedagem, .env, ou vhost).
+
+define('DB_HOST', getenv('DB_HOST') ?: 'localhost');
+define('DB_NAME', getenv('DB_NAME') ?: '');
+define('DB_USER', getenv('DB_USER') ?: '');
+define('DB_PASS', getenv('DB_PASS') ?: '');
 
 function getDBConnection() {
     try {
@@ -19,7 +22,9 @@ function getDBConnection() {
         );
         return $pdo;
     } catch (PDOException $e) {
-        die("Erro na conexão: " . $e->getMessage());
+        // Em produção, não expor detalhes do erro
+        error_log("Erro na conexão com o banco: " . $e->getMessage());
+        die("Erro na conexão com o banco de dados.");
     }
 }
 ?>

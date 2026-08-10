@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="pt">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kongo Arena · Painel Administrativo</title>
+    <link rel="icon" type="image/png" href="assets/favicon.png">
+    <link rel="stylesheet" href="css/style.css">
+</head>
+
+<body>
+
+    <!-- 🛡️ GUARDIÃO DE SEGURANÇA - DEVE SER A PRIMEIRA COISA NO BODY -->
+    <script>
+        (function () {
+            const token = localStorage.getItem('kongo_token');
+            const userStr = localStorage.getItem('kongo_user');
+
+            // 1. Se não tem token, vai para login
+            if (!token || !userStr) {
+                console.log('⛔ Sem token. Redirecionando para login...');
+                window.location.href = 'login.html';
+                return;
+            }
+
+            // 2. Se tem token, verifica o tipo
+            try {
+                const user = JSON.parse(userStr);
+
+                // 3. Se NÃO é admin, manda para cliente.html
+                if (user.tipo !== 'admin') {
+                    console.log('⛔ Usuário é ' + user.tipo + '. Redirecionando para cliente...');
+                    window.location.href = 'cliente.html';
+                    return;
+                }
+
+                // 4. Se é admin, deixa continuar carregando a página
+                console.log('✅ Admin autenticado. Carregando painel...');
+
+                // Preenche os dados do usuário na sidebar
+                document.addEventListener('DOMContentLoaded', function () {
+                    const userName = document.getElementById('userName');
+                    const userType = document.getElementById('userType');
+                    const userAvatar = document.getElementById('userAvatar');
+
+                    if (userName) userName.textContent = user.nome_completo || user.nome || 'Administrador';
+                    if (userType) userType.textContent = user.tipo || 'Admin';
+                    if (userAvatar) userAvatar.textContent = (user.nome_completo || user.nome || 'A').charAt(0).toUpperCase();
+                });
+
+            } catch (e) {
+                console.error('Erro ao ler usuário:', e);
+                localStorage.clear();
+                window.location.href = 'login.html';
+            }
+        })();
+    </script>
+    <!-- 🛡️ FIM DO GUARDIÃO -->
+
+    <div class="app">
+        <aside class="sidebar">
+            <div class="brand" style="padding:16px 20px;">
+                <img src="assets/logo-admin.png" alt="Kongo Arena"
+                    style="max-height:80px; width:auto; display:block; margin:0 auto;">
+            </div>
+
+            <nav>
+                <div class="nav-item" data-section="dashboard"><span class="ic">📊</span> Visão geral</div>
+                <div class="nav-item" data-section="atletas"><span class="ic">🆔</span> Atletas</div>
+                <div class="nav-item" data-section="modalidades"><span class="ic">🏅</span> Modalidades</div>
+                <div class="nav-item" data-section="clubes"><span class="ic">🏛️</span> Clubes</div>
+                <div class="nav-item" data-section="equipas"><span class="ic">👥</span> Equipas</div>
+                <div class="nav-item" data-section="competicoes"><span class="ic">🏆</span> Competições</div>
+                <div class="nav-item" data-section="jogos"><span class="ic">⚽</span> Jogos</div>
+                <div class="nav-item" data-section="licencas"><span class="ic">📋</span> Licenças</div>
+            </nav>
+
+            <div class="bottom">
+                <div class="user-chip">
+                    <div class="av" id="userAvatar">A</div>
+                    <div class="info">
+                        <div class="n" id="userName">—</div>
+                        <div class="t" id="userType">—</div>
+                    </div>
+                </div>
+                <button class="logout-btn" onclick="logout()">Terminar sessão</button>
+            </div>
+        </aside>
+
+        <main class="main" id="mainContent">
+            <div class="loading">A carregar...</div>
+        </main>
+    </div>
+
+    <div class="overlay" id="overlay"></div>
+    <div class="toast" id="toast"></div>
+
+    <script src="js/app.js"></script>
+    <footer
+        style="text-align: center; padding: 20px; margin-top: 40px; font-size: 13px; color: #888; border-top: 1px solid #eee;">
+        Kongo Arena © 2026 · Plataforma Desportiva <br>
+        Desenvolvido por <a href="https://tanquedigital.com.br" target="_blank" rel="noopener noreferrer"
+            style="color: #0066cc; text-decoration: none; font-weight: bold; transition: 0.3s;">TanqueDigital</a>
+    </footer>
+
+    <script>
+        // Função de Logout
+        function logout() {
+            if (confirm('Tem certeza que deseja terminar a sessão?')) {
+                localStorage.removeItem('kongo_token');
+                localStorage.removeItem('kongo_user');
+                window.location.href = 'login.html';
+            }
+        }
+    </script>
+</body>
+
+</html>

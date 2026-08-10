@@ -2,11 +2,14 @@
 
 Plataforma de gestão esportiva.
 
-## 🚀 Acesso
+## 📁 Estrutura
 
-- `admin.html` - Painel Admin
-- `cliente.html` - Área do Cliente
-- `login.html` - Login/Registro
+- `index.html` - Site público
+- `admin/index.html` - Painel Admin
+- `admin/cliente.html` - Área do Cliente
+- `admin/login.html` - Login/Registro
+- `api/` - Backend (PHP + MySQL, API REST + JWT)
+- `database/schema.sql` - Esquema do banco de dados
 
 ## 🛠️ Stack
 
@@ -18,13 +21,17 @@ Plataforma de gestão esportiva.
 ## 📦 Instalação
 
 1. Clone o repositório
-2. Configure `api/config/database.php`
-3. Configure `api/config/jwt.php`
+2. Copie `.env.example` para `.env` e preencha com suas credenciais reais
+   (ou configure as variáveis `DB_HOST`, `DB_NAME`, `DB_USER`, `DB_PASS`,
+   `JWT_SECRET` diretamente no painel de hospedagem/servidor)
+3. Importe `database/schema.sql` no seu banco MySQL
+4. **Nunca faça commit do `.env` real** - ele já está no `.gitignore`
 
-## 🔑 Credenciais de Teste
+## 🔒 Segurança
 
-Usuário: admin
-Senha: admin123
+- As credenciais de banco e a chave JWT NÃO ficam no código-fonte
+- O `.htaccess` bloqueia listagem de diretórios e acesso a arquivos sensíveis
+- Scripts de diagnóstico/emergência não fazem parte do deploy de produção
 
 ---
 Kongo Arena © 2026

@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="pt">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kongo Arena · Painel do Cliente</title>
+    <style>
+        :root {
+            --primary: #2c3e50;
+            --accent: #e74c3c;
+            --bg: #f4f7f6;
+            --card: #ffffff;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg);
+            margin: 0;
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            width: 250px;
+            background: var(--primary);
+            color: white;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+
+        .sidebar h2 {
+            color: white;
+            border-bottom: 2px solid var(--accent);
+            padding-bottom: 10px;
+            display: inline-block;
+        }
+
+        .sidebar ul {
+            list-style: none;
+            padding: 0;
+            margin-top: 30px;
+        }
+
+        .sidebar li {
+            margin: 15px 0;
+        }
+
+        .sidebar a {
+            color: #ecf0f1;
+            text-decoration: none;
+            font-size: 16px;
+            display: block;
+            padding: 10px;
+            border-radius: 5px;
+            transition: 0.3s;
+        }
+
+        .sidebar a:hover,
+        .sidebar a.active {
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+        }
+
+        /* Main Content */
+        .main {
+            flex: 1;
+            padding: 30px;
+            overflow-y: auto;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            border-bottom: 1px solid #ddd;
+            padding-bottom: 15px;
+        }
+
+        /* Cards */
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .card {
+            background: var(--card);
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+            border-left: 5px solid var(--accent);
+        }
+
+        .card h3 {
+            margin-top: 0;
+            color: #7f8c8d;
+            font-size: 14px;
+            text-transform: uppercase;
+        }
+
+        .card p {
+            font-size: 24px;
+            font-weight: bold;
+            color: var(--primary);
+            margin: 10px 0 0 0;
+        }
+
+        /* Tables */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background: white;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        th,
+        td {
+            padding: 15px;
+            text-align: left;
+            border-bottom: 1px solid #eee;
+        }
+
+        th {
+            background: #f8f9fa;
+            font-weight: 600;
+            color: #555;
+        }
+
+        .status-ok {
+            color: green;
+            font-weight: bold;
+        }
+
+        .status-pending {
+            color: orange;
+            font-weight: bold;
+        }
+
+        /* Footer */
+        .footer {
+            text-align: center;
+            padding: 20px;
+            font-size: 12px;
+            color: #888;
+            margin-top: 40px;
+            border-top: 1px solid #eee;
+        }
+
+        .footer a {
+            color: #0066cc;
+            text-decoration: none;
+            font-weight: bold;
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- Sidebar do Cliente -->
+    <nav class="sidebar">
+        <h2>Kongo Arena</h2>
+        <p style="font-size: 12px; color: #bdc3c7;">Área do Clube</p>
+        <ul>
+            <li><a href="#" class="active">📊 Visão Geral</a></li>
+            <li><a href="#">👥 Minha Equipa</a></li>
+            <li><a href="#">⚽ Jogos e Calendário</a></li>
+            <li><a href="#">🏆 Competições</a></li>
+            <li><a href="#">📋 Licenças</a></li>
+            <li style="margin-top: 50px;"><a href="login.html">🚪 Terminar Sessão</a></li>
+        </ul>
+    </nav>
+
+    <!-- Conteúdo Principal -->
+    <main class="main">
+        <div class="header">
+            <h1>Olá, FC Kongo 👋</h1>
+            <span>Temporada 2025/2026</span>
+        </div>
+
+        <!-- Resumo (Dashboard) -->
+        <div class="grid" id="dashboard-cards">
+            <!-- Preenchido via JS -->
+        </div>
+
+        <!-- Secção de Jogos -->
+        <h2>Próximos Confrontos</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>Data</th>
+                    <th>Competição</th>
+                    <th>Adversário</th>
+                    <th>Local</th>
+                    <th>Estado</th>
+                </tr>
+            </thead>
+            <tbody id="tabela-jogos">
+                <!-- Preenchido via JS -->
+            </tbody>
+        </table>
+
+        <!-- Rodapé com Créditos -->
+        <div class="footer">
+            Kongo Arena © 2026 · Plataforma Desportiva <br>
+            Desenvolvido por <a href="https://tanquedigital.com.br" target="_blank">TanqueDigital</a>
+        </div>
+    </main>
+
+    <!-- Script para Estruturar os Dados do Cliente -->
+    <script>
+        // ESTRUTURA DE DADOS (Simulação do que virá da sua API / Backend)
+        const clientData = {
+            stats: {
+                atletasAtivos: 24,
+                proximoJogo: "15 Ago",
+                licencasPendentes: 2,
+                classificacao: "3º Lugar"
+            },
+            jogos: [
+                { data: "15/08/2026", competicao: "Liga Nacional", adversario: "Desportivo da Capital", local: "Estádio Nacional", estado: "Confirmado" },
+                { data: "22/08/2026", competicao: "Taça Kongo", adversario: "Estrela do Norte", local: "Casa (Pavilhão A)", estado: "Pendente" }
+            ]
+        };
+
+        // Renderizar Cards de Resumo
+        const cardsContainer = document.getElementById('dashboard-cards');
+        cardsContainer.innerHTML = `
+            <div class="card"><h3>Atletas Aptos</h3><p>${clientData.stats.atletasAtivos}</p></div>
+            <div class="card"><h3>Próximo Jogo</h3><p>${clientData.stats.proximoJogo}</p></div>
+            <div class="card" style="border-left-color: orange;"><h3>Licenças Pendentes</h3><p>${clientData.stats.licencasPendentes}</p></div>
+            <div class="card" style="border-left-color: #27ae60;"><h3>Classificação</h3><p>${clientData.stats.classificacao}</p></div>
+        `;
+
+        // Renderizar Tabela de Jogos
+        const tabelaJogos = document.getElementById('tabela-jogos');
+        clientData.jogos.forEach(jogo => {
+            tabelaJogos.innerHTML += `
+                <tr>
+                    <td>${jogo.data}</td>
+                    <td>${jogo.competicao}</td>
+                    <td>${jogo.adversario}</td>
+                    <td>${jogo.local}</td>
+                    <td class="${jogo.estado === 'Confirmado' ? 'status-ok' : 'status-pending'}">${jogo.estado}</td>
+                </tr>
+            `;
+        });
+    </script>
+</body>
+
+</html>

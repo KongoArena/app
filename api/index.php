@@ -1,4 +1,7 @@
 <?php
+// Ponte simples: redireciona para a API real
+require __DIR__ . '/../../api/index.php';
+
 // api/index.php - Roteamento central via parâmetro GET "rota" (?rota=...)
 
 header('Content-Type: application/json');
@@ -216,3 +219,4 @@ echo json_encode([
     'rota_solicitada' => $rota,
     'metodo' => $metodo
 ]);
+?>
