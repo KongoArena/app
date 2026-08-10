@@ -715,89 +715,75 @@
   </div>
 </footer>
 
-<!-- MODAL FLOAT KONGO ARENA -->
+<!-- MODAL FLOAT KONGO ARENA (v2) -->
 <div id="kaModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.8);z-index:9999;align-items:center;justify-content:center;padding:20px">
-  <div style="background:#2c2c2c;border-radius:14px;border-top:4px solid #d4af37;max-width:420px;width:100%;padding:28px;position:relative;font-family:Bahnschrift,'Segoe UI',Arial,sans-serif;color:#fff">
-    <button id="kaClose" type="button" style="position:absolute;top:8px;right:14px;background:none;border:none;color:#fff;font-size:24px;cursor:pointer">×</button>
-    <div style="text-align:center;margin-bottom:18px">
-      <div style="width:50px;height:50px;border-radius:10px;background:linear-gradient(135deg,#d4af37,#8a6d1f);display:flex;align-items:center;justify-content:center;color:#212121;font-weight:700;font-size:22px;margin:0 auto 10px">K</div>
-      <h2 style="letter-spacing:1px;font-size:20px">KONGO <span style="color:#d4af37">ARENA</span></h2>
-      <div style="font-size:12px;opacity:.7">Onde o talento se encontra</div>
-    </div>
-    <div id="kaMsg" style="display:none;padding:10px;border-radius:8px;margin-bottom:12px;font-size:14px"></div>
-    <form id="kaLogin">
-      <label style="font-size:13px;display:block;margin-bottom:4px">E-mail</label>
-      <input id="kaEmail" type="email" required style="width:100%;padding:11px;border-radius:6px;border:1px solid #444;background:#1a1a1a;color:#fff;margin-bottom:10px">
-      <label style="font-size:13px;display:block;margin-bottom:4px">Palavra-passe</label>
-      <input id="kaPass" type="password" required style="width:100%;padding:11px;border-radius:6px;border:1px solid #444;background:#1a1a1a;color:#fff;margin-bottom:14px">
-      <button type="submit" style="width:100%;background:#d4af37;color:#212121;border:0;padding:12px;border-radius:6px;font-weight:700;cursor:pointer">Entrar na Conta</button>
-      <button type="button" id="kaGoReg" style="width:100%;background:none;color:#d4af37;border:0;padding:10px;cursor:pointer;margin-top:6px;font-size:13px">Ainda não tens conta? Criar Conta</button>
-    </form>
-    <form id="kaReg" style="display:none">
-      <label style="font-size:13px;display:block;margin-bottom:4px">Nome Completo</label>
-      <input id="kaName" required style="width:100%;padding:11px;border-radius:6px;border:1px solid #444;background:#1a1a1a;color:#fff;margin-bottom:10px">
-      <label style="font-size:13px;display:block;margin-bottom:4px">E-mail</label>
-      <input id="kaRegEmail" type="email" required style="width:100%;padding:11px;border-radius:6px;border:1px solid #444;background:#1a1a1a;color:#fff;margin-bottom:10px">
-      <label style="font-size:13px;display:block;margin-bottom:4px">Palavra-passe (mín. 6)</label>
-      <input id="kaRegPass" type="password" required style="width:100%;padding:11px;border-radius:6px;border:1px solid #444;background:#1a1a1a;color:#fff;margin-bottom:14px">
-      <button type="submit" style="width:100%;background:#d4af37;color:#212121;border:0;padding:12px;border-radius:6px;font-weight:700;cursor:pointer">Criar Minha Conta</button>
-      <button type="button" id="kaGoLogin" style="width:100%;background:none;color:#d4af37;border:0;padding:10px;cursor:pointer;margin-top:6px;font-size:13px">Já tenho conta → Entrar</button>
-    </form>
-  </div>
+<div style="background:#2c2c2c;border-radius:14px;border-top:4px solid #d4af37;max-width:420px;width:100%;padding:28px;position:relative;font-family:Bahnschrift,'Segoe UI',Arial,sans-serif;color:#fff">
+<button id="kaClose" type="button" style="position:absolute;top:8px;right:14px;background:none;border:none;color:#fff;font-size:24px;cursor:pointer">×</button>
+<div style="text-align:center;margin-bottom:18px">
+<div style="width:50px;height:50px;border-radius:10px;background:linear-gradient(135deg,#d4af37,#8a6d1f);display:flex;align-items:center;justify-content:center;color:#212121;font-weight:700;font-size:22px;margin:0 auto 10px">K</div>
+<h2 style="letter-spacing:1px;font-size:20px">KONGO <span style="color:#d4af37">ARENA</span></h2>
+<div style="font-size:12px;opacity:.7">Onde o talento se encontra</div>
+</div>
+<form id="kaLogin" method="POST" action="https://tanquedigital.com.br/kongo/api/index.php?action=login&redirect=1">
+<label style="font-size:13px;display:block;margin-bottom:4px">E-mail</label>
+<input name="email" type="email" required style="width:100%;padding:11px;border-radius:6px;border:1px solid #444;background:#1a1a1a;color:#fff;margin-bottom:10px">
+<label style="font-size:13px;display:block;margin-bottom:4px">Palavra-passe</label>
+<input name="password" type="password" required style="width:100%;padding:11px;border-radius:6px;border:1px solid #444;background:#1a1a1a;color:#fff;margin-bottom:14px">
+<button type="submit" style="width:100%;background:#d4af37;color:#212121;border:0;padding:12px;border-radius:6px;font-weight:700;cursor:pointer">Entrar na Conta</button>
+<button type="button" id="kaGoReg" style="width:100%;background:none;color:#d4af37;border:0;padding:10px;cursor:pointer;margin-top:6px;font-size:13px">Ainda não tens conta? Criar Conta</button>
+</form>
+<form id="kaReg" method="POST" action="https://tanquedigital.com.br/kongo/api/index.php?action=register&redirect=1" style="display:none">
+<label style="font-size:13px;display:block;margin-bottom:4px">Nome Completo</label>
+<input name="name" required style="width:100%;padding:11px;border-radius:6px;border:1px solid #444;background:#1a1a1a;color:#fff;margin-bottom:10px">
+<label style="font-size:13px;display:block;margin-bottom:4px">E-mail</label>
+<input name="email" type="email" required style="width:100%;padding:11px;border-radius:6px;border:1px solid #444;background:#1a1a1a;color:#fff;margin-bottom:10px">
+<label style="font-size:13px;display:block;margin-bottom:4px">Palavra-passe (mín. 6)</label>
+<input name="password" type="password" required minlength="6" style="width:100%;padding:11px;border-radius:6px;border:1px solid #444;background:#1a1a1a;color:#fff;margin-bottom:14px">
+<button type="submit" style="width:100%;background:#d4af37;color:#212121;border:0;padding:12px;border-radius:6px;font-weight:700;cursor:pointer">Criar Minha Conta</button>
+<button type="button" id="kaGoLogin" style="width:100%;background:none;color:#d4af37;border:0;padding:10px;cursor:pointer;margin-top:6px;font-size:13px">Já tenho conta → Entrar</button>
+</form>
+</div>
 </div>
 <script>
 (function () {
   'use strict';
-  var API = 'https://tanquedigital.com.br/kongo/api/index.php';
   var modal = document.getElementById('kaModal');
   function openM(mode) {
+    if (!modal) { window.location.href = 'https://tanquedigital.com.br/kongo/cliente/login.html'; return; }
     modal.style.display = 'flex';
-    document.getElementById('kaLogin').style.display = mode === 'login' ? 'block' : 'none';
-    document.getElementById('kaReg').style.display = mode === 'reg' ? 'block' : 'none';
+    var l = document.getElementById('kaLogin'), r = document.getElementById('kaReg');
+    if (l) l.style.display = (mode === 'reg') ? 'none' : 'block';
+    if (r) r.style.display = (mode === 'reg') ? 'block' : 'none';
   }
-  function kaMsg(t, ok) {
-    var m = document.getElementById('kaMsg');
-    m.style.display = 'block';
-    m.style.background = ok ? 'rgba(46,204,113,.15)' : 'rgba(231,76,60,.15)';
-    m.style.border = '1px solid ' + (ok ? '#2ecc71' : '#e74c3c');
-    m.style.color = ok ? '#2ecc71' : '#e74c3c';
-    m.textContent = t;
-  }
-  // Intercepta os links existentes do index
-  document.querySelectorAll('a[href="login.html"]').forEach(function (a) {
-    a.addEventListener('click', function (e) { e.preventDefault(); openM('login'); });
-  });
-  document.querySelectorAll('a[href="cliente.html"]').forEach(function (a) {
-    a.addEventListener('click', function (e) { e.preventDefault(); openM('reg'); });
-  });
-  document.getElementById('kaClose').onclick = function () { modal.style.display = 'none'; };
-  document.getElementById('kaGoReg').onclick = function () { openM('reg'); };
-  document.getElementById('kaGoLogin').onclick = function () { openM('login'); };
-  modal.addEventListener('click', function (e) { if (e.target === modal) modal.style.display = 'none'; });
-
-  function go(d) {
-    location.href = d.user.role === 'admin'
-      ? 'https://tanquedigital.com.br/kongo/admin/dashboard.html'
-      : 'https://tanquedigital.com.br/kongo/cliente/dashboard.html';
-  }
-  document.getElementById('kaLogin').addEventListener('submit', function (e) {
+  // Intercepta TODOS os botões de login/criar conta (nav, hero, CTA, rodapé e telemóvel)
+  document.addEventListener('click', function (e) {
+    var t = e.target || e.srcElement;
+    if (!t.closest) return;
+    // Links de admin vão direto para o servidor
+    var adm = t.closest('a[href="admin.html"], a[href^="admin/"]');
+    if (adm) {
+      e.preventDefault();
+      var h = adm.getAttribute('href');
+      window.location.href = 'https://tanquedigital.com.br/kongo/' + (h === 'admin.html' ? 'admin/index.html' : h);
+      return;
+    }
+    var a = t.closest('a[href="login.html"], a[href="cliente.html"], .phone-btn, .phone-btn-ghost');
+    if (!a) return;
     e.preventDefault();
-    fetch(API + '?action=login', {method: 'POST', credentials: 'include',
-      headers: {'Content-Type': 'application/json'},
-      body: JSON.stringify({email: document.getElementById('kaEmail').value, password: document.getElementById('kaPass').value})})
-    .then(function (r) { return r.json(); })
-    .then(function (d) { if (d.success) go(d); else kaMsg(d.message || 'Credenciais inválidas.', false); })
-    .catch(function () { kaMsg('Erro de conexão.', false); });
+    var reg = (a.getAttribute('href') === 'cliente.html') || (a.className.indexOf('phone-btn-ghost') !== -1);
+    openM(reg ? 'reg' : 'login');
   });
-  document.getElementById('kaReg').addEventListener('submit', function (e) {
-    e.preventDefault();
-    fetch(API + '?action=register', {method: 'POST', credentials: 'include',
-      headers: {'Content-Type': 'application/json'},
-      body: JSON.stringify({name: document.getElementById('kaName').value, email: document.getElementById('kaRegEmail').value, password: document.getElementById('kaRegPass').value})})
-    .then(function (r) { return r.json(); })
-    .then(function (d) { if (d.success) { kaMsg('Conta criada! Agora faz login.', true); openM('login'); } else kaMsg(d.message, false); })
-    .catch(function () { kaMsg('Erro de conexão.', false); });
-  });
+  var c = document.getElementById('kaClose');  if (c)  c.onclick  = function () { modal.style.display = 'none'; };
+  var gr = document.getElementById('kaGoReg'); if (gr) gr.onclick = function () { openM('reg'); };
+  var gl = document.getElementById('kaGoLogin'); if (gl) gl.onclick = function () { openM('login'); };
+  if (modal) modal.addEventListener('click', function (e) { if (e.target === modal) modal.style.display = 'none'; });
+  // Mensagens que voltam do servidor
+  var p = new URLSearchParams(window.location.search);
+  if (p.get('conta') === 'criada')   { openM('login'); alert('✅ Conta criada! Agora faz login.'); }
+  if (p.get('erro') === 'credenciais') { openM('login'); alert('🔴 E-mail ou palavra-passe incorretos.'); }
+  if (p.get('erro') === 'email')     { openM('reg');   alert('🔴 Este e-mail já está registado.'); }
+  if (p.get('erro') === 'dados')     { openM('reg');   alert('🔴 Preenche todos os campos (mín. 6 caracteres).'); }
+})();
 </script>
 
 <script>
