@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Kongo Arena</title>
+<style>
+  html, body { margin:0; padding:0; height:100%; overflow:hidden; background:#212121; }
+  #kongo-frame {
+    position:fixed; top:0; left:0;
+    width:100%; height:100%;
+    border:0;
+  }
+  #kongo-fallback {
+    display:none;
+    font-family: Arial, sans-serif;
+    color:#fff; background:#212121;
+    height:100%; display:flex; flex-direction:column;
+    align-items:center; justify-content:center; gap:14px; text-align:center; padding:20px;
+  }
+</style>
+</head>
+<body>
+
+<iframe id="kongo-frame" src="https://tanquedigital.com.br/kongo/" title="Kongo Arena" allow="clipboard-write"></iframe>
+
+<div id="kongo-fallback">
+  <p>Não foi possível carregar a plataforma aqui dentro.</p>
+  <a href="https://tanquedigital.com.br/kongo/" style="color:#d4af37;">Abrir Kongo Arena</a>
+</div>
+
+<script>
+  // Se o site de destino recusar ser exibido dentro de um iframe
+  // (por causa do cabeçalho X-Frame-Options / CSP dele), mostramos
+  // um link direto em vez de deixar a tela em branco.
+  var frame = document.getElementById('kongo-frame');
+  var fallback = document.getElementById('kongo-fallback');
+  var carregou = false;
+
+  frame.addEventListener('load', function () { carregou = true; });
+
+  setTimeout(function () {
+    if (!carregou) {
+      frame.style.display = 'none';
+      fallback.style.display = 'flex';
+    }
+  }, 4000);
+</script>
+
+</body>
+</html>

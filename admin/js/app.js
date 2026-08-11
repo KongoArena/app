@@ -197,18 +197,20 @@ async function renderAtletas(container) {
                         <th style="padding:14px 16px;">Nome Completo</th>
                         <th style="padding:14px 16px;">Data Nasc.</th>
                         <th style="padding:14px 16px;">Gênero</th>
+                        <th style="padding:14px 16px;">Clube</th>
                         <th style="padding:14px 16px;">Licença</th>
                         <th style="padding:14px 16px; text-align:right;">Ações</th>
                     </tr>
                 </thead>
                 <tbody>
-                    ${list.length === 0 ? '<tr><td colspan="6" style="padding:20px; text-align:center; color:var(--muted);">Nenhum atleta encontrado.</td></tr>' : 
+                    ${list.length === 0 ? '<tr><td colspan="7" style="padding:20px; text-align:center; color:var(--muted);">Nenhum atleta encontrado.</td></tr>' : 
                     list.map(a => `
                         <tr style="border-bottom:1px solid rgba(255,255,255,0.03);">
                             <td style="padding:14px 16px; font-weight:bold; color:var(--gold);">${a.kongo_id}</td>
                             <td style="padding:14px 16px;">${a.nome_completo}</td>
                             <td style="padding:14px 16px;">${a.data_nascimento || '-'}</td>
                             <td style="padding:14px 16px;">${a.genero || '-'}</td>
+                            <td style="padding:14px 16px;">${a.clube_nome || '-'}</td>
                             <td style="padding:14px 16px;">
                                 <span class="badge ${a.status_licenca === 'ativa' ? 'badge-success' : 'badge-warning'}" style="padding:4px 8px; border-radius:4px; font-size:11px; background:${a.status_licenca === 'ativa' ? 'rgba(107,207,127,0.15)' : 'rgba(224,92,92,0.15)'}; color:${a.status_licenca === 'ativa' ? 'var(--success)' : 'var(--danger)'};">
                                     ${(a.status_licenca || 'expirada').toUpperCase()}
@@ -231,6 +233,12 @@ async function modalAtleta(id = null) {
         data = await apiFetch(`atletas/${id}`) || {};
     }
 
+    // Busca todos os clubes já cadastrados para preencher o dropdown
+    const clubes = await apiFetch('clubes') || [];
+    const opcoesClubes = clubes.map(c =>
+        `<option value="${c.id}" ${data.clube_id == c.id ? 'selected' : ''}>${c.nome}</option>`
+    ).join('');
+
     const content = `
         <form id="formAtleta" onsubmit="salvarAtleta(event, ${id})">
             <div style="display:flex; flex-direction:column; gap:12px;">
@@ -251,6 +259,12 @@ async function modalAtleta(id = null) {
                         <input type="text" id="nacionalidade" value="${data.nacionalidade || 'Angola'}" style="width:100%; padding:8px; background:var(--panel-2); border:1px solid var(--panel-border); color:#fff; border-radius:4px; margin-top:4px;">
                     </label>
                 </div>
+                <label>Clube:
+                    <select id="clube_id" style="width:100%; padding:8px; background:var(--panel-2); border:1px solid var(--panel-border); color:#fff; border-radius:4px; margin-top:4px;">
+                        <option value="">— Sem clube —</option>
+                        ${opcoesClubes}
+                    </select>
+                </label>
                 <button type="submit" style="background:var(--gold); color:#000; border:none; padding:10px; font-weight:bold; border-radius:4px; cursor:pointer; margin-top:10px;">Salvar Atleta</button>
             </div>
         </form>
@@ -260,11 +274,13 @@ async function modalAtleta(id = null) {
 
 async function salvarAtleta(e, id) {
     e.preventDefault();
+    const clubeSelecionado = document.getElementById('clube_id').value;
     const payload = {
         nome_completo: document.getElementById('nome_completo').value,
         data_nascimento: document.getElementById('data_nascimento').value,
         genero: document.getElementById('genero').value,
-        nacionalidade: document.getElementById('nacionalidade').value
+        nacionalidade: document.getElementById('nacionalidade').value,
+        clube_id: clubeSelecionado ? clubeSelecionado : null
     };
 
     const res = await apiFetch(id ? `atletas/${id}` : 'atletas', {

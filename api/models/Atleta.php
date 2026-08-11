@@ -18,11 +18,11 @@ class Atleta {
         $sql = "INSERT INTO cong_atletas (
                     kongo_id, nome_completo, data_nascimento, genero, 
                     fotografia, altura, peso, pe_dominante, nacionalidade, 
-                    cidade, biografia, status_licenca, utilizador_id
+                    cidade, biografia, status_licenca, utilizador_id, clube_id
                 ) VALUES (
                     :kongo_id, :nome_completo, :data_nascimento, :genero,
                     :fotografia, :altura, :peso, :pe_dominante, :nacionalidade,
-                    :cidade, :biografia, :status_licenca, :utilizador_id
+                    :cidade, :biografia, :status_licenca, :utilizador_id, :clube_id
                 )";
         
         $stmt = $this->pdo->prepare($sql);
@@ -43,7 +43,8 @@ class Atleta {
             'cidade' => $dados['cidade'] ?? null,
             'biografia' => $dados['biografia'] ?? null,
             'status_licenca' => $dados['status_licenca'],
-            'utilizador_id' => $dados['utilizador_id'] ?? null
+            'utilizador_id' => $dados['utilizador_id'] ?? null,
+            'clube_id' => !empty($dados['clube_id']) ? $dados['clube_id'] : null
         ];
         $stmt->execute($params);
         $atletaId = $this->pdo->lastInsertId();
@@ -79,13 +80,17 @@ class Atleta {
     }
     
     public function getAll($filtros = []) {
-        $sql = "SELECT a.*, l.status as status_licenca_atual 
+        $sql = "SELECT a.*, l.status as status_licenca_atual, c.nome as clube_nome
                 FROM cong_atletas a
-                LEFT JOIN cong_licencas l ON a.id = l.atleta_id";
+                LEFT JOIN cong_licencas l ON a.id = l.atleta_id
+                LEFT JOIN cong_clubes c ON a.clube_id = c.id";
         
         $condicoes = [];
         if (!empty($filtros['modalidade'])) {
             $condicoes[] = "a.id IN (SELECT atleta_id FROM cong_atleta_modalidades WHERE modalidade_id = " . intval($filtros['modalidade']) . ")";
+        }
+        if (!empty($filtros['clube_id'])) {
+            $condicoes[] = "a.clube_id = " . intval($filtros['clube_id']);
         }
         
         if (!empty($condicoes)) {
@@ -99,9 +104,10 @@ class Atleta {
     }
     
     public function getById($id) {
-        $sql = "SELECT a.*, l.status as status_licenca_atual 
+        $sql = "SELECT a.*, l.status as status_licenca_atual, c.nome as clube_nome
                 FROM cong_atletas a
                 LEFT JOIN cong_licencas l ON a.id = l.atleta_id
+                LEFT JOIN cong_clubes c ON a.clube_id = c.id
                 WHERE a.id = :id";
         $stmt = $this->pdo->prepare($sql);
         $stmt->execute(['id' => $id]);
@@ -133,11 +139,11 @@ class Atleta {
         if (!$atual) return false;
 
         $campos = ['nome_completo', 'data_nascimento', 'genero', 'fotografia', 'altura',
-            'peso', 'pe_dominante', 'nacionalidade', 'cidade', 'biografia'];
+            'peso', 'pe_dominante', 'nacionalidade', 'cidade', 'biografia', 'clube_id'];
 
         $params = ['id' => $id];
         foreach ($campos as $campo) {
-            $params[$campo] = array_key_exists($campo, $dados) ? $dados[$campo] : $atual[$campo];
+            $params[$campo] = array_key_exists($campo, $dados) ? $dados[$campo] : ($atual[$campo] ?? null);
         }
 
         $sql = "UPDATE cong_atletas SET 
@@ -150,7 +156,8 @@ class Atleta {
                     pe_dominante = :pe_dominante,
                     nacionalidade = :nacionalidade,
                     cidade = :cidade,
-                    biografia = :biografia
+                    biografia = :biografia,
+                    clube_id = :clube_id
                 WHERE id = :id";
         
         $stmt = $this->pdo->prepare($sql);

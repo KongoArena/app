@@ -724,21 +724,26 @@
 <h2 style="letter-spacing:1px;font-size:20px">KONGO <span style="color:#d4af37">ARENA</span></h2>
 <div style="font-size:12px;opacity:.7">Onde o talento se encontra</div>
 </div>
-<form id="kaLogin" method="POST" action="https://tanquedigital.com.br/kongo/api/index.php?action=login&redirect=1">
+<div id="kaMsg" style="display:none;padding:8px 10px;border-radius:6px;font-size:12px;margin-bottom:10px;"></div>
+<form id="kaLogin">
 <label style="font-size:13px;display:block;margin-bottom:4px">E-mail</label>
-<input name="email" type="email" required style="width:100%;padding:11px;border-radius:6px;border:1px solid #444;background:#1a1a1a;color:#fff;margin-bottom:10px">
+<input id="kaEmail" name="email" type="email" required style="width:100%;padding:11px;border-radius:6px;border:1px solid #444;background:#1a1a1a;color:#fff;margin-bottom:10px">
 <label style="font-size:13px;display:block;margin-bottom:4px">Palavra-passe</label>
-<input name="password" type="password" required style="width:100%;padding:11px;border-radius:6px;border:1px solid #444;background:#1a1a1a;color:#fff;margin-bottom:14px">
+<input id="kaPass" name="password" type="password" required style="width:100%;padding:11px;border-radius:6px;border:1px solid #444;background:#1a1a1a;color:#fff;margin-bottom:14px">
 <button type="submit" style="width:100%;background:#d4af37;color:#212121;border:0;padding:12px;border-radius:6px;font-weight:700;cursor:pointer">Entrar na Conta</button>
 <button type="button" id="kaGoReg" style="width:100%;background:none;color:#d4af37;border:0;padding:10px;cursor:pointer;margin-top:6px;font-size:13px">Ainda não tens conta? Criar Conta</button>
 </form>
-<form id="kaReg" method="POST" action="https://tanquedigital.com.br/kongo/api/index.php?action=register&redirect=1" style="display:none">
+<form id="kaReg" style="display:none">
 <label style="font-size:13px;display:block;margin-bottom:4px">Nome Completo</label>
-<input name="name" required style="width:100%;padding:11px;border-radius:6px;border:1px solid #444;background:#1a1a1a;color:#fff;margin-bottom:10px">
+<input id="kaName" name="name" required style="width:100%;padding:11px;border-radius:6px;border:1px solid #444;background:#1a1a1a;color:#fff;margin-bottom:10px">
 <label style="font-size:13px;display:block;margin-bottom:4px">E-mail</label>
-<input name="email" type="email" required style="width:100%;padding:11px;border-radius:6px;border:1px solid #444;background:#1a1a1a;color:#fff;margin-bottom:10px">
+<input id="kaRegEmail" name="email" type="email" required style="width:100%;padding:11px;border-radius:6px;border:1px solid #444;background:#1a1a1a;color:#fff;margin-bottom:10px">
 <label style="font-size:13px;display:block;margin-bottom:4px">Palavra-passe (mín. 6)</label>
-<input name="password" type="password" required minlength="6" style="width:100%;padding:11px;border-radius:6px;border:1px solid #444;background:#1a1a1a;color:#fff;margin-bottom:14px">
+<input id="kaRegPass" name="password" type="password" required minlength="6" style="width:100%;padding:11px;border-radius:6px;border:1px solid #444;background:#1a1a1a;color:#fff;margin-bottom:10px">
+<label style="font-size:13px;display:block;margin-bottom:4px">Representas um clube? (opcional)</label>
+<select id="kaRegClube" style="width:100%;padding:11px;border-radius:6px;border:1px solid #444;background:#1a1a1a;color:#fff;margin-bottom:14px">
+  <option value="">— Não, sou atleta/visitante —</option>
+</select>
 <button type="submit" style="width:100%;background:#d4af37;color:#212121;border:0;padding:12px;border-radius:6px;font-weight:700;cursor:pointer">Criar Minha Conta</button>
 <button type="button" id="kaGoLogin" style="width:100%;background:none;color:#d4af37;border:0;padding:10px;cursor:pointer;margin-top:6px;font-size:13px">Já tenho conta → Entrar</button>
 </form>
@@ -755,18 +760,7 @@
 
   if (!modal || !fLogin || !fReg) return;
 
-  // 1. Configura os formulários para enviar direto ao servidor (sem fetch)
-  fLogin.method = 'POST'; fLogin.action = API + '?action=login&redirect=1';
-  fReg.method = 'POST';   fReg.action = API + '?action=register&redirect=1';
-
-  // Garante os nomes dos campos para o PHP
-  document.getElementById('kaEmail').name = 'email';
-  document.getElementById('kaPass').name = 'password';
-  document.getElementById('kaName').name = 'name';
-  document.getElementById('kaRegEmail').name = 'email';
-  document.getElementById('kaRegPass').name = 'password';
-
-  // 2. Função para mostrar mensagens dentro do modal
+  // 1. Função para mostrar mensagens dentro do modal
   function kaMsg(t, ok) {
     var m = document.getElementById('kaMsg');
     if (!m) return;
@@ -777,21 +771,57 @@
     m.textContent = t;
   }
 
-  // 3. Função para abrir o modal
+  // 2. Função para abrir o modal
   function openM(mode) {
     modal.style.display = 'flex';
     fLogin.style.display = (mode === 'reg') ? 'none' : 'block';
     fReg.style.display = (mode === 'reg') ? 'block' : 'none';
-    // Limpa mensagens anteriores ao abrir
     var m = document.getElementById('kaMsg');
     if (m) m.style.display = 'none';
+    if (mode === 'reg') carregarClubesNoRegisto();
   }
 
-  // 4. Intercepta TODOS os cliques em links de login/registo (Nav, Hero, Footer, Mobile)
+  // 3. Carrega a lista de clubes já cadastrados no dropdown de registo
+  var clubesCarregados = false;
+  function carregarClubesNoRegisto() {
+    if (clubesCarregados) return;
+    fetch(API + '?rota=clubes')
+      .then(function (r) { return r.json(); })
+      .then(function (clubes) {
+        var select = document.getElementById('kaRegClube');
+        if (!select || !Array.isArray(clubes)) return;
+        clubes.forEach(function (c) {
+          var opt = document.createElement('option');
+          opt.value = c.id;
+          opt.textContent = c.nome;
+          select.appendChild(opt);
+        });
+        clubesCarregados = true;
+      })
+      .catch(function () { /* silencioso: dropdown fica só com a opção padrão */ });
+  }
+
+  // 4. Depois de autenticar com sucesso, guarda a sessão e redireciona
+  function entrarNaConta(resultado) {
+    localStorage.setItem('kongo_token', resultado.token);
+    localStorage.setItem('kongo_user', JSON.stringify(resultado.user));
+    if (resultado.user.clube_id) {
+      localStorage.setItem('kongo_clube_id', resultado.user.clube_id);
+    } else {
+      localStorage.removeItem('kongo_clube_id');
+    }
+    if (resultado.user.tipo === 'admin') {
+      window.location.href = 'admin/index.html';
+    } else {
+      window.location.href = 'admin/cliente.html';
+    }
+  }
+
+  // 5. Intercepta TODOS os cliques em links de login/registo (Nav, Hero, Footer, Mobile)
   document.addEventListener('click', function (e) {
     var t = e.target || e.srcElement;
     if (!t.closest) return;
-    
+
     // Links de admin vão direto para o servidor
     var adm = t.closest('a[href="admin.html"], a[href^="admin/"]');
     if (adm) {
@@ -800,7 +830,7 @@
       window.location.href = 'https://tanquedigital.com.br/kongo/' + (h === 'admin.html' ? 'admin/index.html' : h);
       return;
     }
-    
+
     // Links de login e registo abrem o modal
     var a = t.closest('a[href="login.html"], a[href="cliente.html"], .phone-btn, .phone-btn-ghost');
     if (!a) return;
@@ -809,42 +839,77 @@
     openM(reg ? 'reg' : 'login');
   });
 
-  // 5. Botões internos do modal
+  // 6. Botões internos do modal
   var c = document.getElementById('kaClose'); if (c) c.onclick = function () { modal.style.display = 'none'; };
   var gr = document.getElementById('kaGoReg'); if (gr) gr.onclick = function () { openM('reg'); };
   var gl = document.getElementById('kaGoLogin'); if (gl) gl.onclick = function () { openM('login'); };
   modal.addEventListener('click', function (e) { if (e.target === modal) modal.style.display = 'none'; });
 
-  // 6. 🚨 VALIDAÇÃO DE CAMPOS VAZIOS (O ALERTA QUE FALTAVA)
-  fLogin.addEventListener('submit', function(e) {
+  // 7. Envio do LOGIN via fetch (JSON), sem recarregar a página
+  fLogin.addEventListener('submit', function (e) {
+    e.preventDefault();
     var email = document.getElementById('kaEmail').value.trim();
     var pass = document.getElementById('kaPass').value.trim();
     if (!email || !pass) {
-      e.preventDefault(); // Bloqueia o envio
       kaMsg('⚠️ Preenche todos os campos.', false);
+      return;
     }
+    fetch(API + '?rota=login', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email: email, senha: pass })
+    })
+      .then(function (r) { return r.json(); })
+      .then(function (resultado) {
+        if (resultado && resultado.success) {
+          kaMsg('✅ Login efetuado! A entrar…', true);
+          entrarNaConta(resultado);
+        } else {
+          kaMsg('🔴 ' + (resultado && resultado.message ? resultado.message : 'E-mail ou palavra-passe incorretos.'), false);
+        }
+      })
+      .catch(function () { kaMsg('🔴 Falha de ligação ao servidor.', false); });
   });
 
-  fReg.addEventListener('submit', function(e) {
+  // 8. Envio do REGISTO via fetch (JSON), sem recarregar a página
+  fReg.addEventListener('submit', function (e) {
+    e.preventDefault();
     var name = document.getElementById('kaName').value.trim();
     var email = document.getElementById('kaRegEmail').value.trim();
     var pass = document.getElementById('kaRegPass').value.trim();
-    
-    if (!name || !email || !pass) {
-      e.preventDefault(); // Bloqueia o envio
-      kaMsg('⚠️ Preenche todos os campos.', false);
-    } else if (pass.length < 6) {
-      e.preventDefault();
-      kaMsg('⚠️ A palavra-passe deve ter no mínimo 6 caracteres.', false);
-    }
-  });
+    var clubeId = document.getElementById('kaRegClube').value;
 
-  // 7. Mensagens e Erros que voltam do servidor via URL
-  var p = new URLSearchParams(window.location.search);
-  if (p.get('conta') === 'criada')   { openM('login'); kaMsg('✅ Conta criada! Agora faz login.', true); }
-  if (p.get('erro') === 'credenciais') { openM('login'); kaMsg('🔴 E-mail ou palavra-passe incorretos.', false); }
-  if (p.get('erro') === 'email')     { openM('reg');   kaMsg('🔴 Este e-mail já está registado.', false); }
-  if (p.get('erro') === 'dados')     { openM('reg');   kaMsg('🔴 Preenche todos os campos corretamente.', false); }
+    if (!name || !email || !pass) {
+      kaMsg('⚠️ Preenche todos os campos.', false);
+      return;
+    }
+    if (pass.length < 6) {
+      kaMsg('⚠️ A palavra-passe deve ter no mínimo 6 caracteres.', false);
+      return;
+    }
+
+    fetch(API + '?rota=register', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        nome_completo: name,
+        email: email,
+        senha: pass,
+        tipo: clubeId ? 'gestor' : 'atleta',
+        clube_id: clubeId || null
+      })
+    })
+      .then(function (r) { return r.json(); })
+      .then(function (resultado) {
+        if (resultado && resultado.success) {
+          kaMsg('✅ Conta criada! Agora faz login.', true);
+          openM('login');
+        } else {
+          kaMsg('🔴 ' + (resultado && resultado.message ? resultado.message : 'Não foi possível criar a conta.'), false);
+        }
+      })
+      .catch(function () { kaMsg('🔴 Falha de ligação ao servidor.', false); });
+  });
 
 })();
 </script>

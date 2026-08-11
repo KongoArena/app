@@ -31,7 +31,8 @@ class Utilizador {
                     'id' => $user['id'],
                     'nome' => $user['nome_completo'],
                     'email' => $user['email'],
-                    'tipo' => $user['tipo']
+                    'tipo' => $user['tipo'],
+                    'clube_id' => $user['clube_id'] ?? null
                 ]
             ];
         }
@@ -42,8 +43,8 @@ class Utilizador {
     public function create($dados) {
         $senhaHash = password_hash($dados['senha'], PASSWORD_DEFAULT);
         
-        $sql = "INSERT INTO cong_utilizadores (nome_completo, email, telefone, senha_hash, tipo, status) 
-                VALUES (:nome_completo, :email, :telefone, :senha_hash, :tipo, 'ativo')";
+        $sql = "INSERT INTO cong_utilizadores (nome_completo, email, telefone, senha_hash, tipo, status, clube_id) 
+                VALUES (:nome_completo, :email, :telefone, :senha_hash, :tipo, 'ativo', :clube_id)";
         
         $stmt = $this->pdo->prepare($sql);
         return $stmt->execute([
@@ -51,7 +52,8 @@ class Utilizador {
             'email' => $dados['email'],
             'telefone' => $dados['telefone'] ?? null,
             'senha_hash' => $senhaHash,
-            'tipo' => $dados['tipo'] ?? 'atleta'
+            'tipo' => $dados['tipo'] ?? 'atleta',
+            'clube_id' => !empty($dados['clube_id']) ? $dados['clube_id'] : null
         ]);
     }
 }

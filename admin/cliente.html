@@ -179,13 +179,13 @@
     <!-- Conteúdo Principal -->
     <main class="main">
         <div class="header">
-            <h1>Olá, FC Kongo 👋</h1>
-            <span>Temporada 2025/2026</span>
+            <h1 id="saudacao-clube">Olá 👋</h1>
+            <span>Temporada 2026</span>
         </div>
 
         <!-- Resumo (Dashboard) -->
         <div class="grid" id="dashboard-cards">
-            <!-- Preenchido via JS -->
+            <div class="card"><h3>A carregar…</h3><p>—</p></div>
         </div>
 
         <!-- Secção de Jogos -->
@@ -201,7 +201,7 @@
                 </tr>
             </thead>
             <tbody id="tabela-jogos">
-                <!-- Preenchido via JS -->
+                <tr><td colspan="5" style="text-align:center; color:#888;">A carregar jogos…</td></tr>
             </tbody>
         </table>
 
@@ -212,44 +212,70 @@
         </div>
     </main>
 
-    <!-- Script para Estruturar os Dados do Cliente -->
+    <!-- Liga o painel do cliente à API real (substitui os dados fixos) -->
+    <script src="js/cliente-api.js"></script>
     <script>
-        // ESTRUTURA DE DADOS (Simulação do que virá da sua API / Backend)
-        const clientData = {
-            stats: {
-                atletasAtivos: 24,
-                proximoJogo: "15 Ago",
-                licencasPendentes: 2,
-                classificacao: "3º Lugar"
-            },
-            jogos: [
-                { data: "15/08/2026", competicao: "Liga Nacional", adversario: "Desportivo da Capital", local: "Estádio Nacional", estado: "Confirmado" },
-                { data: "22/08/2026", competicao: "Taça Kongo", adversario: "Estrela do Norte", local: "Casa (Pavilhão A)", estado: "Pendente" }
-            ]
-        };
+        (async function () {
+            // O ID do clube deste cliente fica guardado no localStorage após o login
+            // (definido em kongo_clube_id assim que o backend devolver essa informação no login).
+            const clubeId = localStorage.getItem('kongo_clube_id');
 
-        // Renderizar Cards de Resumo
-        const cardsContainer = document.getElementById('dashboard-cards');
-        cardsContainer.innerHTML = `
-            <div class="card"><h3>Atletas Aptos</h3><p>${clientData.stats.atletasAtivos}</p></div>
-            <div class="card"><h3>Próximo Jogo</h3><p>${clientData.stats.proximoJogo}</p></div>
-            <div class="card" style="border-left-color: orange;"><h3>Licenças Pendentes</h3><p>${clientData.stats.licencasPendentes}</p></div>
-            <div class="card" style="border-left-color: #27ae60;"><h3>Classificação</h3><p>${clientData.stats.classificacao}</p></div>
-        `;
+            if (!KongoAPI.getToken()) {
+                window.location.href = '../login.html';
+                return;
+            }
 
-        // Renderizar Tabela de Jogos
-        const tabelaJogos = document.getElementById('tabela-jogos');
-        clientData.jogos.forEach(jogo => {
-            tabelaJogos.innerHTML += `
-                <tr>
-                    <td>${jogo.data}</td>
-                    <td>${jogo.competicao}</td>
-                    <td>${jogo.adversario}</td>
-                    <td>${jogo.local}</td>
-                    <td class="${jogo.estado === 'Confirmado' ? 'status-ok' : 'status-pending'}">${jogo.estado}</td>
-                </tr>
+            const cardsContainer = document.getElementById('dashboard-cards');
+            const tabelaJogos = document.getElementById('tabela-jogos');
+            const saudacao = document.getElementById('saudacao-clube');
+
+            // Nome do clube
+            if (clubeId) {
+                const clube = await KongoAPI.getMeuClube(clubeId);
+                if (clube && clube.nome) {
+                    saudacao.textContent = `Olá, ${clube.nome} 👋`;
+                }
+            }
+
+            // Estatísticas reais (equipas, licenças)
+            const [equipas, licencas, jogos] = await Promise.all([
+                KongoAPI.getMinhasEquipas(),
+                KongoAPI.getLicencas(),
+                KongoAPI.getJogos()
+            ]);
+
+            const totalAtletas = Array.isArray(equipas)
+                ? equipas.reduce((soma, eq) => soma + (eq.total_atletas || 0), 0)
+                : 0;
+            const licencasPendentes = Array.isArray(licencas)
+                ? licencas.filter(l => l.status !== 'ativa').length
+                : 0;
+            const proximoJogo = Array.isArray(jogos) && jogos.length
+                ? (jogos[0].data_jogo || jogos[0].data || '—')
+                : '—';
+
+            cardsContainer.innerHTML = `
+                <div class="card"><h3>Atletas Aptos</h3><p>${totalAtletas}</p></div>
+                <div class="card"><h3>Próximo Jogo</h3><p>${proximoJogo}</p></div>
+                <div class="card" style="border-left-color: orange;"><h3>Licenças Pendentes</h3><p>${licencasPendentes}</p></div>
+                <div class="card" style="border-left-color: #27ae60;"><h3>Equipas</h3><p>${Array.isArray(equipas) ? equipas.length : 0}</p></div>
             `;
-        });
+
+            // Tabela de jogos
+            if (Array.isArray(jogos) && jogos.length) {
+                tabelaJogos.innerHTML = jogos.map(jogo => `
+                    <tr>
+                        <td>${jogo.data_jogo || jogo.data || '-'}</td>
+                        <td>${jogo.competicao_nome || jogo.competicao || '-'}</td>
+                        <td>${jogo.adversario || '-'}</td>
+                        <td>${jogo.local || '-'}</td>
+                        <td class="${jogo.status === 'confirmado' ? 'status-ok' : 'status-pending'}">${jogo.status || 'Pendente'}</td>
+                    </tr>
+                `).join('');
+            } else {
+                tabelaJogos.innerHTML = '<tr><td colspan="5" style="text-align:center; color:#888;">Nenhum jogo agendado.</td></tr>';
+            }
+        })();
     </script>
 </body>
 
